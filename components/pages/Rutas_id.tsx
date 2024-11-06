@@ -1,22 +1,28 @@
 'use client'
-import { Card, CardHeader, CardBody, CardFooter, Divider, Link, Image, Button, Input, Textarea } from "@nextui-org/react";
+import { Card, CardHeader, CardBody, CardFooter, Divider, Link, Image, Button, Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, RadioGroup, Radio, getKeyValue } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import { toast } from 'react-toastify'
 import axios from 'axios'
-import { useState } from "react";
-import bcrypt from 'bcryptjs';
+import { useState, useEffect } from "react";
 
 interface Plantillas_Pizarras_idProps {
     ruta?: any
     params?: any
 }
 
+
 export default function Rutas_id({ ruta, params }: Plantillas_Pizarras_idProps) {
+
     const router = useRouter()
     const unid = JSON.parse(ruta)
     const rutId = params.rut
-    console.log(params.fisc)
+    console.log(params.rut)
     const [nombre, setNombre] = useState(unid.nombre)
+
+
+    useEffect(() => {
+        setNombre(unid.nombre);
+    }, [unid.nombre]);
 
     const submitForm = async (e: any) => {
         e.preventDefault();
@@ -25,7 +31,7 @@ export default function Rutas_id({ ruta, params }: Plantillas_Pizarras_idProps) 
             id: rutId
         }
         try {
-            const response = await axios.put(`/api/ruta`, { ...data, _id: params.rut });
+            const response = await axios.put(`/api/rutas`, { ...data, _id: rutId });
             if (response.status === 400) {
                 throw new Error('Error al editar la ruta');
             } else if (response.status == 401) {
@@ -35,8 +41,8 @@ export default function Rutas_id({ ruta, params }: Plantillas_Pizarras_idProps) 
                 console.log(response);
                 toast.error('No se encuentra ninguna ruta con ese ID');
             } else if (response.status === 200) {
-                toast.success('Unidad Editada', {
-                    onClose: () => router.push('/ruta')
+                toast.success('Ruta Editada', {
+                    onClose: () => router.push('/rutas')
                 });
             }
 
@@ -54,10 +60,10 @@ export default function Rutas_id({ ruta, params }: Plantillas_Pizarras_idProps) 
         const deletedPizarra = window.confirm('¿Estás seguro de eliminar la Ruta, esta acción no se puede deshacer')
         if (deletedPizarra) {
             try {
-                const response = await axios.delete(`/api/ruta`, { data: { id: params.rut } });
+                const response = await axios.delete(`/api/rutas`, { data: { id: rutId } });
                 console.log(response)
                 if (response.status == 200) {
-                    toast.success('ruta eliminada con éxito', { onClose: () => router.push('/ruta') })
+                    toast.success('ruta eliminada con éxito', { onClose: () => router.push('/rutas') })
                 } else if (response.status == 409) {
                     console.log(response)
                     throw new Error('No se encuentra ninguna ruta con ese ID')
@@ -69,10 +75,51 @@ export default function Rutas_id({ ruta, params }: Plantillas_Pizarras_idProps) 
         }
         return
     }
+    const rows = [
+        {
+            key: "1",
+            name: "Tony Reichert",
+            role: "CEO",
+            status: "Active",
+        },
+        {
+            key: "2",
+            name: "Zoey Lang",
+            role: "Technical Lead",
+            status: "Paused",
+        },
+        {
+            key: "3",
+            name: "Jane Fisher",
+            role: "Senior Developer",
+            status: "Active",
+        },
+        {
+            key: "4",
+            name: "William Howard",
+            role: "Community Manager",
+            status: "Vacation",
+        },
+    ];
+
+    const columns = [
+        {
+            key: "name",
+            label: "NAME",
+        },
+        {
+            key: "role",
+            label: "ROLE",
+        },
+        {
+            key: "status",
+            label: "STATUS",
+        },
+    ];
     return (
         <>
             <div className="mb-10 rounded-sm border border-stroke bg-slate-200 shadow-default dark:border-strokedark dark:bg-boxdark">
-                <div className="flex justify-center items-center ">
+                <div className="flex flex-col justify-center items-center ">
                     <Card className="my-5 lg:w-1/2">
                         <CardBody className="m-2">
                             <div className="m-5 ">
@@ -90,6 +137,24 @@ export default function Rutas_id({ ruta, params }: Plantillas_Pizarras_idProps) 
                             </div>
                         </CardBody>
                     </Card>
+                    <div className="flex flex-col gap-3">
+                    <Table
+                    selectionMode="multiple" 
+                    aria-label="Example table with dynamic content">
+                        <TableHeader>
+                            {columns.map((column) =>
+                                <TableColumn key={column.key}>{column.label}</TableColumn>
+                            )}
+                        </TableHeader>
+                        <TableBody>
+                            {rows.map((row) =>
+                                <TableRow key={row.key}>
+                                    {(columnKey) => <TableCell>{getKeyValue(row, columnKey)}</TableCell>}
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                    </div>
                 </div>
             </div>
         </>

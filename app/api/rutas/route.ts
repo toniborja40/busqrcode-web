@@ -66,6 +66,7 @@ export async function DELETE(request: any) {
     }
     return NextResponse.json(deletedUnidad);
   } catch (error) {
+    console.log(error);
     return NextResponse.json((error as Error).message, { status: 400 });
   }
 }
