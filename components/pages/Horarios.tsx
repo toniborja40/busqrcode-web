@@ -1,14 +1,8 @@
-'use client'
-
+"use client";
 interface HorariosProps {
-    horarios?: any;
+  horarios?: any;
 }
 
-export default function Horarios({horarios} : HorariosProps) {
-
-    return(
-        <>
-        ola
-        </>
-    )
+export default function Horarios({ horarios }: HorariosProps) {
+  return <>ola</>;
 }
