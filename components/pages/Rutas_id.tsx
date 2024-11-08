@@ -135,7 +135,7 @@ export default function Rutas_id({ ruta, params, fiscales}: Plantillas_Pizarras_
                         toast.error("No se encuentra ninguna ruta con ese ID");
                     } else if (response.status === 200) {
                         toast.success("Fiscales asignados a la ruta", {
-                            onClose: () => location.reload(),
+                            onClose: () => router.push('/rutas'),
                         });
                     }
                 } catch (error) {

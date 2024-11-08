@@ -3,7 +3,8 @@ import { Card, CardHeader, CardBody, CardFooter, Divider, Link, Image, Button, I
 import { useRouter } from "next/navigation";
 import { toast } from 'react-toastify'
 import axios from 'axios'
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import QRCode from 'qrcode'
 
 interface Plantillas_Pizarras_idProps {
     unidad?:any
@@ -17,6 +18,7 @@ export default function Unidades_id({ unidad, params }: Plantillas_Pizarras_idPr
     const [telefono_conductor, setTelefono_conductor] = useState(unid.telefono_conductor)
     const [numero, setNumero] = useState(unid.numero)
     const [placa, setPlaca] = useState(unid.placa)
+    const [src, setSrc] = useState('')
 
     const submitForm = async (e: any) => {
         e.preventDefault();
@@ -71,6 +73,16 @@ export default function Unidades_id({ unidad, params }: Plantillas_Pizarras_idPr
         }
         return
     }
+    const generateQR = async (text: string | QRCode.QRCodeSegment[]) => {
+        try {
+          setSrc(await QRCode.toDataURL(text, { errorCorrectionLevel: 'H' }))
+        } catch (err) {
+            console.error(err)
+        }
+    }
+    useEffect(() => {
+        generateQR(unid._id)
+    }, [])
     return (
         <>
             <div className="mb-10 rounded-sm border border-stroke bg-slate-200 shadow-default dark:border-strokedark dark:bg-boxdark">
@@ -94,8 +106,14 @@ export default function Unidades_id({ unidad, params }: Plantillas_Pizarras_idPr
                                 </div>
                                 </form>
                         </CardBody>
+                        <Divider/>
+                        <CardFooter>
+                        <div className="flex flex-row justify-center items-center">
+                        <h1 className="text-xl my-3 font-bold">Código QR de la unidad</h1>
+                        {src ? <Image src={src} alt="QR" /> : ''}
+                        </div>
+                        </CardFooter>
                     </Card>
-
                 </div>
               
                 <div className="m-5">

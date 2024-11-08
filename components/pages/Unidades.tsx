@@ -31,8 +31,7 @@ export default function Unidades({ unidades }: UnidadesProps) {
                     <div className="flex flex-col">
                       <Link
                         href={`/unidades/${unidad._id}`}
-                        className="text-md"
-                      >
+                        className="text-md">
                         Unidad {unidad.numero}
                       </Link>
                     </div>

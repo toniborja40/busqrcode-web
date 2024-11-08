@@ -14,8 +14,8 @@ const hora = new Schema(
             required: true,
             trim: true,
         },
-        hora: {
-            type: String,
+        tiempo_entre: {
+            type: Number,
             required: true,
             trim: true,
         }
@@ -28,6 +28,12 @@ const horarios = new Schema(
             type: String,
             required: true,
             trim: true,
+        },
+        ruta_id:{
+            type:  Schema.Types.ObjectId,
+            ref: 'rutas',
+            required: true,
+            trim: true
         },
         horas: [hora],
     }

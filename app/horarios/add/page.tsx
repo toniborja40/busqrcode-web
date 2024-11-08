@@ -1,16 +1,17 @@
 import horarios from "@/models/horarios";
 import { connectDB } from "@/libs/db";
-import Horarios from "@/components/pages/Horarios";
+import Horarios_add from "@/components/pages/Horarios_add";
 import rutas from "@/models/rutas";
+import fiscales from "@/models/fiscales";
 connectDB()
+
 export default async function Home() {
-    const hor = await horarios.find();
-    const data = JSON.stringify(hor)
     const rut = await rutas.find();
+    const fis = await fiscales.find();
 
     return (
         <>
-            <Horarios horarios={data} rutas={JSON.stringify(rut)}/>
+            <Horarios_add rutas={JSON.stringify(rut)} fiscales={JSON.stringify(fis)} />
         </>
     )
 }

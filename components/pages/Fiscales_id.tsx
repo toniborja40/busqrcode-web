@@ -82,7 +82,7 @@ export default function Plantillas_Pizarras_id({ fiscal, params }: Plantillas_Pi
                     <Card className="my-5 lg:w-1/2">
                         <CardBody className="m-2">
                             <div className="m-5 ">
-                                <h1 className="text-xl font-bold">Agregar Fiscal</h1>
+                                <h1 className="text-xl font-bold">Editar Fiscal</h1>
                                 <Divider />
                                 <div className="my-4 w-full">
                                     <form onSubmit={submitForm} className="grid gap-4 pr-3 w-full" >
