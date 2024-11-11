@@ -16,24 +16,25 @@ export default function Horarios({ horarios, rutas }: HorariosProps) {
   <>
       <div className="mb-10 rounded-sm border border-stroke bg-slate-200 shadow-default dark:border-strokedark dark:bg-boxdark">
         <div className="flex flex-col justify-center items-center m-4">
-          <h1 className="text-2xl font-bold ">Horarios</h1>
+          <h1 className="text-xl font-bold ">Horarios</h1>
           <div className="grid grid-cols-3 my-4 gap-4">
             {horario.map((horario: any, index: any) => {
+              const ru = ruta.filter((r:any) => r._id === horario.ruta_id)
+              console.log(ru)
               return (
                 <Card key={horario._id} className="max-w-[300px]">
                   <CardHeader className="flex gap-3">
-                    <div className="flex flex-col">
+                    <div className="flex flex">
                       <Link
                         href={`/horarios/${horario._id}`}
-                        className="text-md">
-                        horario {horario.nombre}
+                        className="text-md">{horario.nombre}
                       </Link>
                     </div>
                   </CardHeader>
                   <Divider />
                   <CardBody>
                     <p>
-                      <b>Ruta:</b> 
+                      <b>Ruta: {ru[0].nombre}</b> 
                     </p>
                   </CardBody>
                   <Divider />

@@ -1,24 +1,25 @@
 import { connectDB } from "@/libs/db";
 import rutas from "@/models/rutas";
 import { NextResponse } from "next/server";
+import horarios from "@/models/horarios";
 
 connectDB();
 
 export async function POST(request: any) {
-  const { nombre } = await request.json();
+  const { nombre, horas, ruta_id } = await request.json();
 
   try {
-    const findUnidad = await rutas.findOne({ nombre });
-    if (findUnidad) {
+    const findHorario = await horarios.findOne({ nombre });
+    if (findHorario) {
       return NextResponse.json(
-        { error: "Ya existe una ruta con ese nombre" },
+        { error: "Ya existe un horario con ese nombre" },
         { status: 401 }
       );
     }
-    const newUnidad = new rutas({
-      nombre,
+    const newHorario = new horarios({
+      nombre, horas, ruta_id
     });
-    const savedUnidad = await newUnidad.save();
+    const savedUnidad = await newHorario.save();
     return NextResponse.json(savedUnidad);
   } catch (error) {
     return NextResponse.json((error as Error).message, { status: 400 });
