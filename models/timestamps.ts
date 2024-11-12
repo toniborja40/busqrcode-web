@@ -30,3 +30,5 @@ const timestamps = new Schema(
     timestamps: true,
   }
 );
+
+export default models.timestamps || model("timestamps", timestamps);

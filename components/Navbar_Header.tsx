@@ -1,6 +1,7 @@
 'use client'
 import React from "react";
 import { Navbar, NavbarBrand, NavbarContent, NavbarItem, NavbarMenuToggle, NavbarMenu, NavbarMenuItem, Link, Button } from "@nextui-org/react";
+import axios from "axios";
 // import { Luclogo } from "./Luclogo";
 
 export default function Navbar_header() {
@@ -12,10 +13,17 @@ export default function Navbar_header() {
     {name: 'Rutas', link:'/rutas'},
     {name: 'Horarios', link:'/horarios'}
   ];
+  const loggedOut = () => {
+    axios.get('/api/auth/logout')
+    .then(response => {
+      if(response.status == 200){
+        location.reload();
+      }
+    })
+  }
 
   return (
     <Navbar onMenuOpenChange={setIsMenuOpen} className=" grid grid-cols-2 bg-blue-950">
-     
       <NavbarContent>
         <NavbarMenuToggle
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
@@ -37,12 +45,23 @@ export default function Navbar_header() {
             </Link>
           </NavbarItem>
         ))}
+
+        <Link
+        href="/login"
+          onClick={loggedOut}
+          color={"foreground"
+          }
+          className="w-full text-slate-100"
+        >
+          Cerrar Sesión
+        </Link>
       </NavbarContent>
       
       <NavbarMenu>
+          <NavbarMenuItem >
         {menuItems.map((item, index) => (
-          <NavbarMenuItem key={`${item}-${index}`}>
             <Link
+              key={`${item}-${index}`}
               color={ "foreground"
               }
               className="w-full"
@@ -51,8 +70,8 @@ export default function Navbar_header() {
             >
               {item.name}
             </Link>
-          </NavbarMenuItem>
         ))}
+          </NavbarMenuItem>
       </NavbarMenu>
     </Navbar>
   );

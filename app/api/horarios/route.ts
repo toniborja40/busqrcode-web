@@ -2,13 +2,23 @@ import { connectDB } from "@/libs/db";
 import rutas from "@/models/rutas";
 import { NextResponse } from "next/server";
 import horarios from "@/models/horarios";
+import jwt, { JwtPayload, Secret } from "jsonwebtoken";
+import { cookies } from "next/headers";
 
 connectDB();
+const jwtName = process.env.JWT_NAME;
+if (!jwtName) {
+  throw new Error("JWT_NAME is not defined in environment variables");
+}
+ 
 
 export async function POST(request: any) {
   const { nombre, horas, ruta_id } = await request.json();
-
+   const cookieStore = await cookies();
+   const token: any = cookieStore.get(jwtName as any);
+  
   try {
+     jwt.verify(token.value, process.env.JWT_SECRET as Secret) as JwtPayload;
     const findHorario = await horarios.findOne({ nombre });
     if (findHorario) {
       return NextResponse.json(
@@ -27,23 +37,26 @@ export async function POST(request: any) {
 }
 
 export async function PUT(request: any) {
-  const { nombre, fiscales, _id } = await request.json();
-  console.log(nombre, fiscales);
+  const { nombre, horas, _id, ruta_id } = await request.json();
+   const cookieStore = cookies();
+   const token: any = (await cookieStore).get(jwtName as any);
+  
   try {
-    const findNumero = await rutas.findOne({ nombre });
+     jwt.verify(token.value, process.env.JWT_SECRET as Secret) as JwtPayload;
+    const findNumero = await horarios.findOne({ nombre });
     if (findNumero && findNumero._id.toString() != _id) {
       return NextResponse.json(
-        { error: "Ya existe un fiscal con este número" },
+        { error: "Ya existe un fiscalhorariocon este número" },
         { status: 401 }
       );
     }
-    const updatedUnidad = await rutas.findOneAndUpdate(
+    const updatedUnidad = await horarios.findOneAndUpdate(
       { _id },
-      { nombre, fiscales }
+      { nombre, horas, ruta_id },  
     );
     if (!updatedUnidad) {
       return NextResponse.json(
-        { error: "No se encuentra ningún fiscal con ese ID" },
+        { error: "No se encuentra ningún horario con ese ID" },
         { status: 409 }
       );
     }
@@ -55,10 +68,12 @@ export async function PUT(request: any) {
 }
 
 export async function DELETE(request: any) {
-  const { id } = await request.json();
-  console.log(id);
+  const { _id } = await request.json();
+   const cookieStore = cookies();
+   const token: any = (await cookieStore).get(jwtName as any);
   try {
-    const deletedUnidad = await rutas.findByIdAndDelete(id);
+     jwt.verify(token.value, process.env.JWT_SECRET as Secret) as JwtPayload;
+    const deletedUnidad = await horarios.findByIdAndDelete(_id);
     if (!deletedUnidad) {
       return NextResponse.json(
         { error: "No se encuentra ninguna unidad con ese ID" },

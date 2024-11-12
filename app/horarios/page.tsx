@@ -7,7 +7,6 @@ export default async function Home() {
     const hor = await horarios.find();
     const data = JSON.stringify(hor)
     const rut = await rutas.find();
-    console.log(data)
 
     return (
         <>

@@ -9,6 +9,12 @@ import Navbar_header from "../components/Navbar_Header";
 import SideBar from "@/components/SideBar";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import jwt, { JwtPayload, Secret } from "jsonwebtoken";
+import { cookies } from "next/headers";
+const jwtName = process.env.JWT_NAME;
+if (!jwtName) {
+  throw new Error("JWT_NAME is not defined in environment variables");
+}
 
 export const metadata: Metadata = {
   title: {
@@ -28,11 +34,21 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
-}) {
+}){
+  const cookieStore = await cookies();
+  const token: any = cookieStore.get(jwtName as any);
+  let verification = true;
+  try {
+    jwt.verify(token.value, process.env.JWT_SECRET as Secret) as JwtPayload;
+    verification = true;
+  } catch (error) {
+    verification = false
+  }
+
   return (
     <html suppressHydrationWarning lang="en">
       <head />
@@ -44,13 +60,17 @@ export default function RootLayout({
       >
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
           <div className="relative flex flex-col h-screen">
-            <Navbar_header />
+            {verification ?<> <Navbar_header />
             <div className="flex flex-row flex-grow">
-              <SideBar />
+             <SideBar />
               <main className="container flex-grow relative pt-8 px-6">
                 {children}
               </main>
-            </div>
+              </div></>
+               : 
+              <main className=" flex-grow relative pt-8 px-6">
+              {children}
+            </main>} 
             {/* <footer className="w-full flex items-center justify-center py-3">
               {/* colocar algo aquí después
             </footer> */}

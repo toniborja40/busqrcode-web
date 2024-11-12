@@ -6,7 +6,6 @@ import { toast } from "react-toastify";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import bcrypt from "bcryptjs";
 
 interface UnidadesProps {
   rutas?: any;
@@ -70,7 +69,7 @@ export default function Horarios_add({ rutas, fiscales }: UnidadesProps) {
                 <Divider />
                 <div className="my-4 w-full">
                   <form onSubmit={handleSubmit} className=" pr-3 w-full gap-4">
-                    <div className="flex flex-cols gap-4 m-3">
+                    <div className="flex flex-col lg:flex-row gap-4 m-3">
                       <div>
                         <label
                           htmlFor="ruta"

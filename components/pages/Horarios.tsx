@@ -17,7 +17,8 @@ export default function Horarios({ horarios, rutas }: HorariosProps) {
       <div className="mb-10 rounded-sm border border-stroke bg-slate-200 shadow-default dark:border-strokedark dark:bg-boxdark">
         <div className="flex flex-col justify-center items-center m-4">
           <h1 className="text-xl font-bold ">Horarios</h1>
-          <div className="grid grid-cols-3 my-4 gap-4">
+        </div>
+          <div className="grid grid-cols-3 m-5 gap-4">
             {horario.map((horario: any, index: any) => {
               const ru = ruta.filter((r:any) => r._id === horario.ruta_id)
               console.log(ru)
@@ -46,13 +47,13 @@ export default function Horarios({ horarios, rutas }: HorariosProps) {
             <Link href="/horarios/add">
               <Button
                 variant="shadow"
-                className={`bg-green-700 text-slate-100`}
+                className={`bg-green-700 text-slate-100 m-4`}
               >
                 Agregar horario
               </Button>
             </Link>
           </div>
-        </div>
+      
       </div>
   </>);
 }
