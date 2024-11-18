@@ -33,7 +33,7 @@ export default function Login() {
 
     return (
         <>
-            <div className="mb-10 rounded-sm border border-stroke bg-slate-200 shadow-default dark:border-strokedark dark:bg-boxdark">
+            <div className="mb-10 rounded-sm border border-stroke dark:bg-slate-800 bg-slate-200 shadow-default dark:border-strokedark dark:bg-boxdark">
             <div className="flex justify-center items-center m-10">
                 <form onSubmit={submit}>
                     <Card className='m-4'>

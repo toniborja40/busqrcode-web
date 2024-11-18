@@ -96,7 +96,7 @@ export default function Horarios_id({
 
   return (
     <>
-      <div className="mb-10 rounded-sm border border-stroke bg-slate-200 shadow-default dark:border-strokedark dark:bg-boxdark">
+      <div className="mb-10 rounded-sm border border-stroke dark:bg-slate-800 bg-slate-200 shadow-default dark:border-strokedark dark:bg-boxdark">
         <div className="flex justify-center items-center m-10">
           <Card className="my-5 w-full">
             <CardBody className="m-2">
@@ -109,7 +109,7 @@ export default function Horarios_id({
                       <div>
                         <label
                           htmlFor="ruta"
-                          className="block text-sm font-medium text-gray-700"
+                          className="block text-sm font-medium dark:text-slate-100 text-gray-700"
                         >
                           Seleccionar Ruta
                         </label>
@@ -136,7 +136,7 @@ export default function Horarios_id({
                           <div>
                             <label
                               htmlFor="addHorario"
-                              className="block text-sm font-medium text-gray-700"
+                              className="block text-sm font-medium dark:text-slate-100 text-gray-700"
                             >
                               Añadir tiempo entre fiscales
                             </label>
@@ -173,7 +173,7 @@ export default function Horarios_id({
                           <div>
                             <label
                               htmlFor="nombre"
-                              className="block text-sm font-medium text-gray-700"
+                              className="block text-sm font-medium dark:text-slate-100 text-gray-700"
                             >
                               Nombre del Horario
                             </label>
@@ -197,7 +197,7 @@ export default function Horarios_id({
                         {horas.length > 0
                           ? horas.map((hor: any, index: any) => (
                               <div
-                                className="relative bg-slate-200 p-4 rounded-md"
+                              className="relative dark:bg-slate-800 bg-slate-200 p-4 rounded-md"
                                 key={index}
                               >
                                 <button
@@ -230,7 +230,7 @@ export default function Horarios_id({
                                   <div>
                                     <label
                                       htmlFor="FiscalA"
-                                      className="block text-sm font-medium text-gray-700"
+                                    className="block text-sm font-medium dark:text-slate-100 text-gray-700"
                                     >
                                       Fiscal A
                                     </label>
@@ -261,7 +261,7 @@ export default function Horarios_id({
                                   <div>
                                     <label
                                       htmlFor="FiscalB"
-                                      className="block text-sm font-medium text-gray-700"
+                                    className="block text-sm font-medium dark:text-slate-100 text-gray-700"
                                     >
                                       Fiscal B
                                     </label>
@@ -292,7 +292,7 @@ export default function Horarios_id({
                                   <div>
                                     <label
                                       htmlFor="tiempo_entre"
-                                      className="block text-sm font-medium text-gray-700"
+                                    className="block text-sm font-medium dark:text-slate-100 text-gray-700"
                                     >
                                       Tiempo en Minutos
                                     </label>

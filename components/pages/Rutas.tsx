@@ -33,7 +33,7 @@ export default function Fiscales({ rutas }: fiscalesProps) {
 
   return (
     <>
-      <div className="mb-10 rounded-sm border border-stroke bg-slate-200 shadow-default dark:border-strokedark dark:bg-boxdark">
+      <div className="mb-10 rounded-sm border border-stroke dark:bg-slate-800 bg-slate-200 shadow-default dark:border-strokedark dark:bg-boxdark">
         <div className="m-5">
           <div className="grid grid-cols-3 my-4 gap-4">
             {ruta.map((unidad: any, index: any) => {

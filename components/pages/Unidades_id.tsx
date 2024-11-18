@@ -85,7 +85,7 @@ export default function Unidades_id({ unidad, params }: Plantillas_Pizarras_idPr
     }, [])
     return (
         <>
-            <div className="mb-10 rounded-sm border border-stroke bg-slate-200 shadow-default dark:border-strokedark dark:bg-boxdark">
+            <div className="mb-10 rounded-sm border border-stroke dark:bg-slate-800 bg-slate-200 shadow-default dark:border-strokedark dark:bg-boxdark">
                 <div className="flex flex-col justify-center items-center m-4">
                     <Card>
                         <CardHeader className="mx-4 flex flex-col justify-center items-center">
@@ -95,23 +95,21 @@ export default function Unidades_id({ unidad, params }: Plantillas_Pizarras_idPr
                         <CardBody>
                                 <form onSubmit={submitForm} >
                                 <div className="grid grid-cols-2 gap-4 m-6"> 
-                                    <Input name="nombre_conductor" isRequired required type='text' value={nombre_conductor} label='Nombre del Conductor' onChange={(e)=> setNombre_conductor(e.target.value)}/> 
-                                    <Input name="placa" isRequired required type='text' value={placa} label='Placa' onChange={(e) => setPlaca(e.target.value)} /> 
-                                    <Input name="telefono_conductor" isRequired required type='number' value={telefono_conductor} label='Teléfono del Conductor' onChange={(e) => setTelefono_conductor(e.target.value)} /> 
-                                    <Input name="numero" isRequired required type='number' value={numero} label='Numero de la Unidad' onChange={(e) => setNumero(e.target.value)} /> 
+                                    <Input size='lg' name="nombre_conductor" isRequired required type='text' value={nombre_conductor} label='Nombre del Conductor' onChange={(e)=> setNombre_conductor(e.target.value)}/> 
+                                    <Input size='lg' name="placa" isRequired required type='text' value={placa} label='Placa' onChange={(e) => setPlaca(e.target.value)} /> 
+                                    <Input size='lg' name="telefono_conductor" isRequired required type='number' value={telefono_conductor} label='Teléfono del Conductor' onChange={(e) => setTelefono_conductor(e.target.value)} /> 
+                                    <Input size='lg' name="numero" isRequired required type='number' value={numero} label='Numero de la Unidad' onChange={(e) => setNumero(e.target.value)} /> 
                                 </div>
                                 <div className="grid grid-cols-2 gap-4 justify-center items-center">
-                                    <Button type="submit" variant="shadow" className="w-full bg-green-700 text-slate-100"> Editar Unidad</Button>
-                                    <Button onClick={() => deletePizarra()} variant="shadow" className="lg:w-full  bg-red-700 text-slate-100">Eliminar Unidad</Button>
+                                    <Button type="submit" variant="shadow" className="w-full bg-green-700 text-slate-100 text-lg py-6"> Editar Unidad</Button>
+                                    <Button onClick={() => deletePizarra()} variant="shadow" className="lg:w-full  bg-red-700 text-slate-100 text-lg py-6">Eliminar Unidad</Button>
                                 </div>
                                 </form>
                         </CardBody>
                         <Divider/>
-                        <CardFooter>
-                        <div className="flex flex-row justify-center items-center">
-                        <h1 className="text-xl my-3 font-bold">Código QR de la unidad</h1>
-                        {src ? <Image src={src} alt="QR" /> : ''}
-                        </div>
+                        <CardFooter className="flex flex-row justify-between items-center">
+                        <h1 className="text-xl my-3 font-bold">Código QR de la Unidad</h1>
+                        {src ? <Image className="mx-16" src={src} alt="QR" /> : ''}
                         </CardFooter>
                     </Card>
                 </div>

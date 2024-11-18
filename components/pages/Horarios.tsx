@@ -14,7 +14,7 @@ export default function Horarios({ horarios, rutas }: HorariosProps) {
 
   return(
   <>
-      <div className="mb-10 rounded-sm border border-stroke bg-slate-200 shadow-default dark:border-strokedark dark:bg-boxdark">
+      <div className="mb-10 rounded-sm border border-stroke dark:bg-slate-800 bg-slate-200 shadow-default dark:border-strokedark dark:bg-boxdark">
         <div className="flex flex-col justify-center items-center m-4">
           <h1 className="text-xl font-bold ">Horarios</h1>
         </div>
@@ -25,7 +25,7 @@ export default function Horarios({ horarios, rutas }: HorariosProps) {
               return (
                 <Card key={horario._id} className="max-w-[300px]">
                   <CardHeader className="flex gap-3">
-                    <div className="flex flex">
+                    <div className="flex">
                       <Link
                         href={`/horarios/${horario._id}`}
                         className="text-md">{horario.nombre}
