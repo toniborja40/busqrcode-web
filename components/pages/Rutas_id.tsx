@@ -1,11 +1,12 @@
 "use client";
 import {
-    Card, CardHeader, CardBody, CardFooter, Divider, Link, Image, Button, Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, RadioGroup, Radio, getKeyValue,
+    Card, CardHeader, CardBody, CardFooter, Divider, Image, Button, Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, RadioGroup, Radio, getKeyValue,
 } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { useState, useEffect, Key } from "react";
+import Link from "next/link";
 
 interface Plantillas_Pizarras_idProps {
     ruta?: any;
