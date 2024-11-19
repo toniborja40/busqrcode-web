@@ -11,7 +11,7 @@ export async function connectDB() {
     return;
   }
 
-  const dburl = 'mongodb+srv://villamizarandresdavid:Shoko.180506@businfotachira.nn3l8.mongodb.net/busqrcode?retryWrites=true&w=majority&appName=spluc';
+  const dburl = process.env.MONGODB;
 
   if (!dburl) {
     throw new Error("MongoDB URL is undefined");

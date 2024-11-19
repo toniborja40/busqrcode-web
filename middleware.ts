@@ -24,7 +24,6 @@ export async function middleware(request: any) {
     return NextResponse.next();
 }
 }else{
-     console.log("error");
     // Si el usuario no está autenticado y no está en la página de login, redirigir a la página de login
     if (request.nextUrl.pathname != "/login") {
         return NextResponse.redirect(new URL("/login", request.url));
