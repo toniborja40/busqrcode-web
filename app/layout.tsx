@@ -76,7 +76,7 @@ export default async function RootLayout({
             </footer> */}
           </div>
         </Providers>
-        <ToastContainer />
+        <ToastContainer autoClose={2000} />
       </body>
     </html>
   );
