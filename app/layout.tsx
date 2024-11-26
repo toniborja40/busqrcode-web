@@ -61,9 +61,9 @@ export default async function RootLayout({
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
           <div className="relative flex flex-col h-screen">
             {verification ?<> <Navbar_header />
-            <div className="flex flex-row flex-grow">
+            <div className="flex justify-center items-center">
              {/* <SideBar /> */}
-              <main className="container flex-grow relative pt-8 px-6">
+              <main className="container relative pt-8 px-6">
                 {children}
               </main>
               </div></>

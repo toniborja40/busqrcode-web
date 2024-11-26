@@ -16,13 +16,13 @@ export async function POST(request: any) {
    const token: any = cookieStore.get(jwtName as any);
    try {
      jwt.verify(token.value, process.env.JWT_SECRET as Secret) as JwtPayload;
-     const findUnidad = await unidades.findOne({ placa });
-     if (findUnidad) {
-       return NextResponse.json(
-         { error: "Ya existe una unidad con esta placa" },
-         { status: 401 }
-       );
-     }
+    //  const findUnidad = await unidades.findOne({ placa });
+    //  if (findUnidad) {
+    //    return NextResponse.json(
+    //      { error: "Ya existe una unidad con esta placa" },
+    //      { status: 401 }
+    //    );
+    //  }
      const newUnidad = new unidades({
        placa,
        numero,
@@ -45,13 +45,13 @@ export async function PUT(request: any) {
    const token: any = cookieStore.get(jwtName as any);
    try {
      jwt.verify(token.value, process.env.JWT_SECRET as Secret) as JwtPayload;
-     const findUnidad = await unidades.findOne({ placa });
-     if (findUnidad && findUnidad._id != _id) {
-       return NextResponse.json(
-         { error: "Ya existe una unidad con esta placa" },
-         { status: 401 }
-       );
-     }
+    //  const findUnidad = await unidades.findOne({ placa });
+    //  if (findUnidad && findUnidad._id != _id) {
+    //    return NextResponse.json(
+    //      { error: "Ya existe una unidad con esta placa" },
+    //      { status: 401 }
+    //    );
+    //  }
      const findNumero = await unidades.findOne({ numero });
      if (findNumero && findNumero._id != _id) {
        return NextResponse.json(
@@ -71,6 +71,7 @@ export async function PUT(request: any) {
      }
      return NextResponse.json(updatedUnidad);
    } catch (error) {
+    console.log(error)
      return NextResponse.json((error as Error).message, { status: 400 });
    }
 }

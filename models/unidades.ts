@@ -5,7 +5,7 @@ const unidades = new Schema(
     placa: {
       type: String,
       required: true,
-      unique: true,
+      // unique: true,
       trim: true,
     },
     numero: {

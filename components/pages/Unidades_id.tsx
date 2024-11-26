@@ -61,7 +61,7 @@ export default function Unidades_id({ unidad, params }: Plantillas_Pizarras_idPr
                 const response = await axios.delete(`/api/unidades`, { data: { id: params.unid } });
                 console.log(response)
                 if (response.status == 200) {
-                    toast.success('Pizarra eliminada con éxito', { onClose: () => router.push('/unidades') })
+                    toast.success('Unidad eliminada con éxito', { onClose: () => router.push('/unidades') })
                 } else if (response.status == 409) {
                     console.log(response)
                     throw new Error('No se encuentra ninguna unidad con ese ID')
