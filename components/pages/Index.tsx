@@ -51,7 +51,7 @@ export default function Index({
   const unidades_ = JSON.parse(unidades).sort(
     (a: any, b: any) => a.numero - b.numero
   );
-
+ 
   const [fecha, setFecha] = useState<any>(todayDate);
   const [unidad, setUnidad] = useState<any>(null);
   const [ruta, setRuta] = useState<any>(null);
