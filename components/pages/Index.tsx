@@ -191,7 +191,7 @@ export default function Index({
         const fiscalBExists = rows.some((row: any) => row.fiscal === fiscalB);
        
     if (fiscalAExists && fiscalBExists && timeCompare) {
-
+ 
     
     const getTimestampsA: any[] = rows.map((timestamp: any) => {
       return {
