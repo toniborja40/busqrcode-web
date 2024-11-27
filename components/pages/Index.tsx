@@ -99,18 +99,8 @@ export default function Index({
     let registros = timestamp.hora_servidor.includes(fecha);
     return registros;
   });
-  if (unidad && ruta) {
-    rows = rows.filter(
-      (timestamp: any) => timestamp.unidad == unidad && timestamp.ruta === ruta
-    );
-  } else if (ruta) {
-    rows = rows.filter((timestamp: any) => timestamp.ruta === ruta);
-  } else if (fiscal) {
-    rows = rows.filter((timestamp: any) => timestamp.fiscal === fiscal);
-  } else if (unidad) {
-    rows = rows.filter((timestamp: any) => timestamp.unidad == unidad);
-  }
-  const columns = [
+
+  let columns = [
     {
       key: "hora_servidor",
       label: "Hora Servidor",
@@ -132,6 +122,51 @@ export default function Index({
       label: "Fiscal",
     },
   ];
+  if (unidad && ruta) {
+  columns = [
+    {
+      key: "hora_servidor",
+      label: "Hora Servidor",
+    },
+    {
+      key: "hora_telefono",
+      label: "Hora Teléfono",
+    },
+    {
+      key: "unidad",
+      label: "Unidad",
+    },
+    {
+      key: "ruta",
+      label: "Ruta",
+    },
+    {
+      key: "fiscal",
+      label: "Fiscal",
+    },
+    {
+      key: "onTimeText",
+      label: "On Time",
+    },
+    {
+      key: "diff",
+      label: "Diferencia (min)",
+    },
+    {
+      key: "delay",
+      label: "Retraso (min)",
+    }
+  ];
+    rows = rows.filter(
+      (timestamp: any) => timestamp.unidad == unidad && timestamp.ruta === ruta
+    );
+  } else if (ruta) {
+    rows = rows.filter((timestamp: any) => timestamp.ruta === ruta);
+  } else if (fiscal) {
+    rows = rows.filter((timestamp: any) => timestamp.fiscal === fiscal);
+  } else if (unidad) {
+    rows = rows.filter((timestamp: any) => timestamp.unidad == unidad);
+  }
   const resetFilter = () => {
     setUnidad(null);
     setRuta(null);
@@ -152,8 +187,6 @@ export default function Index({
     "timeCompare",
     timeCompare
   );
-
-  
         const fiscalAExists = rows.some((row: any) => row.fiscal === fiscalA);
         const fiscalBExists = rows.some((row: any) => row.fiscal === fiscalB);
        
@@ -191,6 +224,7 @@ export default function Index({
 
     const compare = (rowsA: any, rowsB: any, timeCompare: any) => {
       let result: {
+        onTimeText: string;
         onTime: boolean;
         key: any;
         hora_servidorA: any;
@@ -203,7 +237,7 @@ export default function Index({
         delay?: number;
       }[] = [];
 
-      if(fiscalA === fiscalB){
+      if(fiscalA === fiscalB){ //Mismo fiscal
           for (let i = 0; i < rowsA.length-1; i++) {
               const diff = Math.abs(
                   new Date(rowsA[i].hora_servidor).getTime() -
@@ -211,6 +245,7 @@ export default function Index({
               );
               if (diff >= timeCompare * 60000) {
                   result.push({
+                      onTimeText: "A tiempo",  
                       onTime: true,
                       key: rowsB[i+1].key,
                       hora_servidorA: rowsA[i].hora_servidor,
@@ -223,6 +258,7 @@ export default function Index({
                   });
               } else {
                   result.push({
+                      onTimeText: "Retardado",
                       onTime: false,
                       key: rowsB[i+1].key,
                       hora_servidorA: rowsA[i].hora_servidor,
@@ -237,7 +273,81 @@ export default function Index({
               }
           }
           return result;
-      }else{
+      }else if(rowsA.length > rowsB.length){ //rowsA.length MAYOR rowsB.length
+        for (let i = 0; i < rowsA.length - 1; i++) {
+          const diff = Math.abs(
+            new Date(rowsA[i].hora_servidor).getTime() -
+            new Date(rowsB[i].hora_servidor).getTime()
+          );
+          if (diff >= timeCompare * 60000) {
+            result.push({
+              onTimeText: "A tiempo",
+              onTime: true,
+              key: rowsB[i].key,
+              hora_servidorA: rowsA[i].hora_servidor,
+              hora_telefonoA: rowsA[i].hora_telefono,
+              fiscalA: rowsA[i].fiscal,
+              hora_servidorB: rowsB[i].hora_servidor,
+              hora_telefonoB: rowsB[i].hora_telefono,
+              fiscalB: rowsB[i].fiscal,
+              diff: diff / 60000,
+              delay: 0
+            });
+          } else {
+            result.push({
+              onTimeText: "Retardado",
+              onTime: false,
+              key: rowsB[i].key,
+              hora_servidorA: rowsA[i].hora_servidor,
+              hora_telefonoA: rowsA[i].hora_telefono,
+              fiscalA: rowsA[i].fiscal,
+              hora_servidorB: rowsB[i].hora_servidor,
+              hora_telefonoB: rowsB[i].hora_telefono,
+              fiscalB: rowsB[i].fiscal,
+              diff: diff / 60000,
+              delay: timeCompare - (diff / 60000)
+            });
+          }
+        }
+        return result;
+      }else if(rowsA.length < rowsB.length){ //rowsA.length MENOR rowsB.length
+         for (let i = 0; i < rowsA.length; i++) {
+          const diff = Math.abs(
+            new Date(rowsA[i].hora_servidor).getTime() -
+            new Date(rowsB[i +1].hora_servidor).getTime()
+          );
+          if (diff >= timeCompare * 60000) {
+            result.push({
+              onTimeText: "A tiempo",
+              onTime: true,
+              key: rowsB[i +1].key,
+              hora_servidorA: rowsA[i].hora_servidor,
+              hora_telefonoA: rowsA[i].hora_telefono,
+              fiscalA: rowsA[i].fiscal,
+              hora_servidorB: rowsB[i +1].hora_servidor,
+              hora_telefonoB: rowsB[i +1].hora_telefono,
+              fiscalB: rowsB[i +1].fiscal,
+              diff: diff / 60000,
+              delay: 0
+            });
+          } else {
+            result.push({
+              onTimeText: "Retardado",
+              onTime: false,
+              key: rowsB[i +1].key,
+              hora_servidorA: rowsA[i].hora_servidor,
+              hora_telefonoA: rowsA[i].hora_telefono,
+              fiscalA: rowsA[i].fiscal,
+              hora_servidorB: rowsB[i +1].hora_servidor,
+              hora_telefonoB: rowsB[i +1].hora_telefono,
+              fiscalB: rowsB[i +1].fiscal,
+              diff: diff / 60000,
+              delay: timeCompare - (diff / 60000)
+            });
+          }
+        }
+        return result;
+      }else{ //rowsA.length IGUAL rowsB.length
           for (let i = 0; i < rowsA.length; i++) {
               const diff = Math.abs(
           new Date(rowsA[i].hora_servidor).getTime() -
@@ -245,6 +355,7 @@ export default function Index({
         );
         if (diff >= timeCompare * 60000) {
           result.push({
+            onTimeText: "A tiempo",
             onTime: true,
             key: rowsB[i].key,
             hora_servidorA: rowsA[i].hora_servidor,
@@ -254,9 +365,11 @@ export default function Index({
             hora_telefonoB: rowsB[i].hora_telefono,
             fiscalB: rowsB[i].fiscal,
             diff: diff / 60000,
+            delay: 0
           });
         } else {
           result.push({
+            onTimeText: "Retardado",
             onTime: false,
             key: rowsB[i].key,
             hora_servidorA: rowsA[i].hora_servidor,
@@ -275,9 +388,21 @@ export default function Index({
     };
     const comparedTimes = compare(rowsA, rowsB, timeCompare);
     console.log(comparedTimes);
-    } 
-
-    
+      rows = rows.map((row: any) => {
+        const comparedTime = comparedTimes.find((ct: any) => ct.key === row.key);
+        if (comparedTime) {
+          return {
+            ...row,
+            onTime: comparedTime.onTime,
+            diff: comparedTime.diff,
+            delay: comparedTime.delay,
+            onTimeText: comparedTime.onTimeText
+          };
+        }
+        return row;
+      });
+      console.log(rows);
+  } 
   return (
     <>
       <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
