@@ -192,7 +192,7 @@ export default function Index({
        
     if (fiscalAExists && fiscalBExists && timeCompare) {
  
-    
+     
     const getTimestampsA: any[] = rows.map((timestamp: any) => {
       return {
         key: timestamp.key,
