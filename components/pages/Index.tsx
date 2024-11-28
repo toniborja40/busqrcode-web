@@ -37,7 +37,7 @@ const getTodayDate = () => {
 const todayDate = getTodayDate();
 export default function Index({
   horarios,
-  rutas,
+  rutas, 
   fiscales,
   timestamps, 
   unidades,
