@@ -39,7 +39,7 @@ export default function Index({
   horarios,
   rutas,
   fiscales,
-  timestamps,
+  timestamps, 
   unidades,
 }: IndexProps) {
   const horarios_ = JSON.parse(horarios);
