@@ -109,7 +109,14 @@ export default function Unidades_id({ unidad, params }: Plantillas_Pizarras_idPr
                         <Divider/>
                         <CardFooter className="flex flex-row justify-between items-center">
                         <h1 className="text-xl my-3 font-bold">Código QR de la Unidad</h1>
-                        {src ? <Image className="mx-16" src={src} alt="QR" /> : ''}
+                            {src ? (
+                                <div className="flex flex-col items-center">
+                                    <Image className="mx-16" src={src} alt="QR" />
+                                    <a href={src} download={`unidad${numero}`}className="mt-2 text-blue-500 underline">
+                                        Descargar QR
+                                    </a>
+                                </div>
+                            ) : ''}
                         </CardFooter>
                     </Card>
                 </div>
