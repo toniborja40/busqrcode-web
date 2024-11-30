@@ -243,7 +243,7 @@ export default function Index({
                   new Date(rowsA[i].hora_servidor).getTime() -
                   new Date(rowsB[i+1].hora_servidor).getTime()
               );
-              if (diff >= timeCompare * 60000) {
+              if (diff <= timeCompare * 60000) {
                   result.push({
                       onTimeText: "A tiempo",  
                       onTime: true,
@@ -268,7 +268,7 @@ export default function Index({
                       hora_telefonoB: rowsB[i+1].hora_telefono,
                       fiscalB: rowsB[i+1].fiscal,
                       diff: diff / 60000,
-                      delay: timeCompare - (diff / 60000)
+                      delay: (diff / 60000) - timeCompare
                   });
               }
           }
@@ -279,7 +279,7 @@ export default function Index({
             new Date(rowsA[i].hora_servidor).getTime() -
             new Date(rowsB[i].hora_servidor).getTime()
           );
-          if (diff >= timeCompare * 60000) {
+          if (diff <= timeCompare * 60000) {
             result.push({
               onTimeText: "A tiempo",
               onTime: true,
@@ -316,7 +316,7 @@ export default function Index({
             new Date(rowsA[i].hora_servidor).getTime() -
             new Date(rowsB[i +1].hora_servidor).getTime()
           );
-          if (diff >= timeCompare * 60000) {
+          if (diff <= timeCompare * 60000) {
             result.push({
               onTimeText: "A tiempo",
               onTime: true,
@@ -353,7 +353,7 @@ export default function Index({
           new Date(rowsA[i].hora_servidor).getTime() -
             new Date(rowsB[i].hora_servidor).getTime()
         );
-        if (diff >= timeCompare * 60000) {
+        if (diff <= timeCompare * 60000) {
           result.push({
             onTimeText: "A tiempo",
             onTime: true,
