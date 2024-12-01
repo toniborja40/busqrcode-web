@@ -305,7 +305,7 @@ export default function Index({
               hora_telefonoB: rowsB[i].hora_telefono,
               fiscalB: rowsB[i].fiscal,
               diff: diff / 60000,
-              delay: timeCompare - (diff / 60000)
+              delay: (diff / 60000) - timeCompare
             });
           }
         }
@@ -342,7 +342,7 @@ export default function Index({
               hora_telefonoB: rowsB[i +1].hora_telefono,
               fiscalB: rowsB[i +1].fiscal,
               diff: diff / 60000,
-              delay: timeCompare - (diff / 60000)
+              delay: (diff / 60000) - timeCompare
             });
           }
         }
@@ -379,7 +379,7 @@ export default function Index({
             hora_telefonoB: rowsB[i].hora_telefono,
             fiscalB: rowsB[i].fiscal,
             diff: diff / 60000,
-            delay: timeCompare - (diff / 60000)
+            delay: (diff / 60000) - timeCompare
           });
         }
       }
