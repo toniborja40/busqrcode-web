@@ -122,46 +122,80 @@ export default function Index({
       label: "Fiscal",
     },
   ];
-  if (unidad && ruta) {
-  columns = [
-    {
-      key: "hora_servidor",
-      label: "Hora Servidor",
-    },
-    {
-      key: "hora_telefono",
-      label: "Hora Teléfono",
-    },
-    {
-      key: "unidad",
-      label: "Unidad",
-    },
-    {
-      key: "ruta",
-      label: "Ruta",
-    },
-    {
-      key: "fiscal",
-      label: "Fiscal",
-    },
-    {
-      key: "onTimeText",
-      label: "On Time",
-    },
-    {
-      key: "diff",
-      label: "Diferencia (min)",
-    },
-    {
-      key: "delay",
-      label: "Retraso (min)",
-    }
-  ];
-    rows = rows.filter(
-      (timestamp: any) => timestamp.unidad == unidad && timestamp.ruta === ruta
-    );
+  if (ruta && unidad) {
+    columns = [
+      {
+        key: "hora_servidor",
+        label: "Hora Servidor",
+      },
+      {
+        key: "hora_telefono",
+        label: "Hora Teléfono",
+      },
+      {
+        key: "unidad",
+        label: "Unidad",
+      },
+      {
+        key: "ruta",
+        label: "Ruta",
+      },
+      {
+        key: "fiscal",
+        label: "Fiscal",
+      },
+      {
+        key: "onTimeText",
+        label: "On Time",
+      },
+      {
+        key: "diff",
+        label: "Diferencia (min)",
+      },
+      {
+        key: "delay",
+        label: "Retraso (min)",
+      }
+    ];
+    rows = rows.filter((timestamp: any) => timestamp.unidad == unidad && timestamp.ruta === ruta); 
   } else if (ruta) {
-    rows = rows.filter((timestamp: any) => timestamp.ruta === ruta);
+    columns = [
+      {
+        key: "hora_servidor",
+        label: "Hora Servidor",
+      },
+      {
+        key: "hora_telefono",
+        label: "Hora Teléfono",
+      },
+      {
+        key: "unidad",
+        label: "Unidad",
+      },
+      {
+        key: "ruta",
+        label: "Ruta",
+      },
+      {
+        key: "fiscal",
+        label: "Fiscal",
+      },
+      {
+        key: "onTimeText",
+        label: "On Time",
+      },
+      {
+        key: "diff",
+        label: "Diferencia (min)",
+      },
+      {
+        key: "delay",
+        label: "Retraso (min)",
+      }
+    ];
+    rows = rows.filter(
+      (timestamp: any) => timestamp.ruta === ruta
+    );
   } else if (fiscal) {
     rows = rows.filter((timestamp: any) => timestamp.fiscal === fiscal);
   } else if (unidad) {
@@ -522,8 +556,8 @@ export default function Index({
         <div className={classNames("grid grid-cols-1 md:grid-cols-3 gap-4")}>
           <div
             className={classNames("flex gap-3", {
-              "col-span-2": unidad && ruta,
-              "col-span-3": !unidad || !ruta,
+              "col-span-2": ruta,
+              "col-span-3": !ruta,
             })}
           >
             <Table  aria-label="Example table with dynamic content">
@@ -549,7 +583,7 @@ export default function Index({
               </TableBody>
             </Table>
           </div>
-          {unidad && ruta && (
+          { ruta && (
             <div>
               <div>
                 <Card>
