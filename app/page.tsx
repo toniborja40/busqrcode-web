@@ -12,7 +12,6 @@ export default async function Home() {
   const horario = await horarios.find()
   const unidad = await unidades.find()
   const fiscal = await fiscales.find()
-  console.log(timestamp);
   return (
     <Index timestamps={JSON.stringify(timestamp)} horarios={JSON.stringify(horario)} rutas={JSON.stringify(ruta)}  unidades={JSON.stringify(unidad)} fiscales={JSON.stringify(fiscal)} />
   );

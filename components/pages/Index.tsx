@@ -15,8 +15,9 @@ import {
 } from "@nextui-org/react";
 import Link from "next/link";
 import classNames from "classnames";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import axios from "axios";
 interface IndexProps {
   horarios?: any;
   rutas?: any;
@@ -30,7 +31,7 @@ const getTodayDate = () => {
   const year = today.getFullYear();
   const month = String(today.getMonth() + 1).padStart(2, "0");
   const day = String(today.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
+  return {fecha:`${year}-${month}-${day}`};
 };
 
 // Uso de la función
@@ -47,18 +48,31 @@ export default function Index({
   const fiscales_ = JSON.parse(fiscales).sort((a: any, b: any) =>
     a.numero.localeCompare(b.numero)
   );
-  const timestamps_ = JSON.parse(timestamps);
+  // const timestamps_ = JSON.parse(timestamps);
   const unidades_ = JSON.parse(unidades).sort(
     (a: any, b: any) => a.numero - b.numero
   );
  
-  const [fecha, setFecha] = useState<any>(todayDate);
+  const [fecha, setFecha] = useState<any>(todayDate.fecha);
   const [unidad, setUnidad] = useState<any>(null);
   const [ruta, setRuta] = useState<any>(null);
   const [fiscal, setFiscal] = useState<any>(null);
   const [horario, setHorario] = useState<any>(null);
+  const [timestamps_, setTimestamps_] = useState<any>([]);
 
-  console.log(horarios_[0]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.post("/api/timestamps", {fecha:fecha});
+        setTimestamps_(response.data);
+      } catch (error) {
+        console.log('error', fecha)
+        console.log(error)
+      }
+    }
+    fetchData();
+  }, [fecha]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -72,7 +86,7 @@ export default function Index({
     hours = hours % 12;
     hours = hours ? hours : 12; // the hour '0' should be '12'
     const strHours = String(hours).padStart(2, "0");
-    return `${strHours}:${minutes} ${ampm}`;
+    return `${year}-${month}-${day}  ${strHours}:${minutes} ${ampm}`;
   };
 
   //Comparación de datos
@@ -85,7 +99,6 @@ export default function Index({
     const ruta = rutas_.filter((r: any) => r._id === timestamp.id_ruta);
     const fiscal = fiscales_.filter((f: any) => f._id === timestamp.id_fiscal);
     const unidad = unidades_.filter((u: any) => u._id === timestamp.id_unidad);
-    console.log(unidad);
     return {
       key: timestamp._id,
       hora_servidor: formatDate(timestamp.createdAt),
@@ -212,7 +225,6 @@ export default function Index({
   };
 
   //comparación de datos
-  console.log(rows);
   console.log(
     "fiscalA",
     fiscalA,
@@ -421,7 +433,6 @@ export default function Index({
         }
     };
     const comparedTimes = compare(rowsA, rowsB, timeCompare);
-    console.log(comparedTimes);
       rows = rows.map((row: any) => {
         const comparedTime = comparedTimes.find((ct: any) => ct.key === row.key);
         if (comparedTime) {
@@ -435,7 +446,6 @@ export default function Index({
         }
         return row;
       });
-      console.log(rows);
   } 
   return (
     <>

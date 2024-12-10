@@ -1,72 +1,39 @@
-import { connectDB } from "@/libs/db";
-import rutas from "@/models/rutas";
 import { NextResponse } from "next/server";
-
+import {connectDB} from "@/libs/db";
+import timestamps from "@/models/timestamps";
+import moment from "moment-timezone";
 connectDB();
 
 export async function POST(request: any) {
-  const { nombre } = await request.json();
+  const { fecha } = await request.json(); // fecha en formato yyyy-mm-dd
 
   try {
-    const findUnidad = await rutas.findOne({ nombre });
-    if (findUnidad) {
-      return NextResponse.json(
-        { error: "Ya existe una ruta con ese nombre" },
-        { status: 401 }
-      );
-    }
-    const newUnidad = new rutas({
-      nombre,
-    });
-    const savedUnidad = await newUnidad.save();
-    return NextResponse.json(savedUnidad);
+  const startOfDayVenezuela = moment.tz(`${fecha}T00:00:00`, "America/Caracas");
+  const endOfDayVenezuela = moment.tz(
+    `${fecha}T23:59:59.999`,
+    "America/Caracas"
+  );
+
+  // Convertir a hora UTC
+  const startOfDayUTC = startOfDayVenezuela.utc().toDate();
+  const endOfDayUTC = endOfDayVenezuela.utc().toDate();
+
+  console.log(startOfDayUTC, endOfDayUTC);
+
+  const registrosDeHoy = await timestamps.find({
+    createdAt: {
+      $gte: startOfDayUTC,
+      $lte: endOfDayUTC,
+    },
+  });
+
+  console.log(registrosDeHoy);
+    console.log(fecha)
+    return NextResponse.json(registrosDeHoy);
   } catch (error) {
-    return NextResponse.json((error as Error).message, { status: 400 });
-  }
-}
-
-export async function PUT(request: any) {
-  const { nombre, fiscales, _id } = await request.json();
-  console.log(nombre, fiscales);
-  try {
-    const findNumero = await rutas.findOne({ nombre });
-    if (findNumero && findNumero._id.toString() != _id) {
-      return NextResponse.json(
-        { error: "Ya existe un fiscal con este número" },
-        { status: 401 }
-      );
-    }
-    const updatedUnidad = await rutas.findOneAndUpdate(
-      { _id },
-      { nombre, fiscales }
+    return NextResponse.json(
+      { error: "Error al obtener los registros" },
+      { status: 500 }
     );
-    if (!updatedUnidad) {
-      return NextResponse.json(
-        { error: "No se encuentra ningún fiscal con ese ID" },
-        { status: 409 }
-      );
-    }
-    return NextResponse.json(updatedUnidad);
-  } catch (error) {
-    console.log;
-    return NextResponse.json((error as Error).message, { status: 400 });
-  }
-}
-
-export async function DELETE(request: any) {
-  const { id } = await request.json();
-  console.log(id);
-  try {
-    const deletedUnidad = await rutas.findByIdAndDelete(id);
-    if (!deletedUnidad) {
-      return NextResponse.json(
-        { error: "No se encuentra ninguna unidad con ese ID" },
-        { status: 409 }
-      );
-    }
-    return NextResponse.json(deletedUnidad);
-  } catch (error) {
-    console.log(error);
-    return NextResponse.json((error as Error).message, { status: 400 });
   }
 }
