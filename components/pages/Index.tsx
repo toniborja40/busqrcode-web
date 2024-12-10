@@ -88,6 +88,20 @@ export default function Index({
     const strHours = String(hours).padStart(2, "0");
     return `${year}-${month}-${day}  ${strHours}:${minutes} ${ampm}`;
   };
+  const formatHour = (dateString: string) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    let hours = date.getHours();
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const secs = String(date.getSeconds()).padStart(2, "0");
+    const ampm = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+    const strHours = String(hours).padStart(2, "0");
+    return `  ${strHours}:${minutes} ${ampm}`;
+  };
 
   //Comparación de datos
 
@@ -101,15 +115,16 @@ export default function Index({
     const unidad = unidades_.filter((u: any) => u._id === timestamp.id_unidad);
     return {
       key: timestamp._id,
-      hora_servidor: formatDate(timestamp.createdAt),
-      hora_telefono: formatDate(timestamp.timestamp_telefono),
+      hora_date: formatDate(timestamp.createdAt),
+      hora_servidor: formatHour(timestamp.createdAt),
+      hora_telefono: formatHour(timestamp.timestamp_telefono),
       unidad: unidad[0].numero,
       ruta: ruta[0].nombre,
       fiscal: fiscal[0].ubicacion,
     };
   });
   let rows = getTimestamps.filter((timestamp: any) => {
-    let registros = timestamp.hora_servidor.includes(fecha);
+    let registros = timestamp.hora_date.includes(fecha);
     return registros;
   });
 
