@@ -5,14 +5,15 @@ import { NextResponse } from "next/server";
 connectDB();
 
 export async function POST(request: any) {
-  const {id_ruta, id_unidad, id_fiscal, timestamp_telefono} = await request.json();
-  console.log(id_ruta, id_unidad, id_fiscal, timestamp_telefono);
+  const {id_ruta, id_unidad, id_fiscal, timestamp_telefono, timestamp_salida} = await request.json();
+  console.log(id_ruta, id_unidad, id_fiscal, timestamp_telefono, timestamp_salida);
   try {
     const timestamp = new timestamps({
       id_ruta,
       id_unidad,
       id_fiscal,
       timestamp_telefono,
+      timestamp_salida
     });;
     const saveTimestamp = await timestamp.save();
     return NextResponse.json(saveTimestamp);

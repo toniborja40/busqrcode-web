@@ -24,6 +24,11 @@ const timestamps = new Schema(
         type: String,
         required: true,
         trim: true,
+    },
+    timestamp_salida:{
+        type: String,
+        default: null,
+        trim: true,
     }
   },
   {
