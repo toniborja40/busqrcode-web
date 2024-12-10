@@ -72,7 +72,7 @@ export default function Index({
     hours = hours % 12;
     hours = hours ? hours : 12; // the hour '0' should be '12'
     const strHours = String(hours).padStart(2, "0");
-    return `${year}-${month}-${day} ${strHours}:${minutes} ${ampm}`;
+    return `${strHours}:${minutes} ${ampm}`;
   };
 
   //Comparación de datos
