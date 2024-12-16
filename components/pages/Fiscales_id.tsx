@@ -1,5 +1,5 @@
 'use client'
-import { Card, CardHeader, CardBody, CardFooter, Divider, Link, Image, Button, Input, Textarea } from "@nextui-org/react";
+import { Card, CardHeader, CardBody, CardFooter, Divider, Link, Image, Button, Input, Textarea, Switch } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import { toast } from 'react-toastify'
 import axios from 'axios'
@@ -20,6 +20,7 @@ export default function Plantillas_Pizarras_id({ fiscal, params }: Plantillas_Pi
     const [ubicacion, setUbicacion] = useState(unid.ubicacion)
     const [username, setUsername] = useState(unid.username)
     const [password, setPassword] = useState('')
+    const [hora, setHora] = useState(unid.sethora);
 
     const submitForm = async (e: any) => {
         e.preventDefault();
@@ -28,7 +29,8 @@ export default function Plantillas_Pizarras_id({ fiscal, params }: Plantillas_Pi
             ubicacion,
             username,
             password: await bcrypt.hash(password, 10),
-            id: fiscId
+            id: fiscId,
+            sethora: hora
         }
         try {
             const response = await axios.put(`/api/fiscales`, { ...data, _id: params.fisc });
@@ -90,6 +92,7 @@ export default function Plantillas_Pizarras_id({ fiscal, params }: Plantillas_Pi
                                         <Input name='username' isRequired required type='text' value={username} label='Nombre de Usuario Fiscal' onChange={(e) => setUsername(e.target.value)} />
                                         <Input name='password' isRequired required type='text' label='Contraseña' min={8} onChange={(e) => setPassword(e.target.value)} />
                                         <Textarea name="ubicacion" isRequired required type='text' value={ubicacion} label='Ubicacion del Fiscal' onChange={(e) => setUbicacion(e.target.value)} />
+                                        <Switch name='sethora' defaultSelected={hora} onChange={(e) => setHora(e.target.checked)}>¿Selecciona Hora?</Switch>
                                         <div className="grid grid-cols-2 gap-4 justify-center items-center">
                                             <Button type="submit" variant="shadow" className="w-full bg-green-700 text-slate-100"> Editar Fiscal</Button>
                                             <Button onClick={() => deletePizarra()} variant="shadow" className="lg:w-full  bg-red-700 text-slate-100">Eliminar Fiscal</Button>

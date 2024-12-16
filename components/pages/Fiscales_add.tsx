@@ -1,5 +1,5 @@
 'use client'
-import { Input, Divider, Button, Textarea, TimeInput, Checkbox, Card, CardBody, CardHeader, CardFooter, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, getKeyValue, Link, Select, SelectItem } from "@nextui-org/react";
+import { Input, Divider, Button, Textarea, TimeInput, Checkbox, Card, CardBody, Switch } from "@nextui-org/react";
 import { Time } from "@internationalized/date";
 import { toast } from "react-toastify";
 import { useState, useEffect } from "react";
@@ -15,7 +15,7 @@ export default function Fiscales_add({ unidades }: UnidadesProps) {
     const router = useRouter();
 
     const [password, setPassword] = useState('');
-    
+    const [hora, setHora] = useState(false);
 
 
     const submitForm = async (e: any) => {
@@ -25,6 +25,7 @@ export default function Fiscales_add({ unidades }: UnidadesProps) {
             ubicacion: form.get('ubicacion'),
             numero: form.get('numero'),
             username: form.get('username'),
+            sethora: hora,
             password: await bcrypt.hash(password, 10)
         }
         try {
@@ -39,6 +40,7 @@ export default function Fiscales_add({ unidades }: UnidadesProps) {
                     onClose: () => router.push('/fiscales')
                 });
             }
+            console.log(data)
         } catch (error: any) {
             console.log(error);
             if (error.response.status === 400) {
@@ -64,6 +66,7 @@ export default function Fiscales_add({ unidades }: UnidadesProps) {
                                         <Input name="numero" isRequired required type='number' label='Número del Fiscal' />
                                         <Input name='username' isRequired required type='text' label='Nombre de usuario'/>
                                         <Input name='password' isRequired required type='text' min={8} value={password} onChange={(e)=> setPassword(e.target.value)} label='Contraseña'/>
+                                        <Switch name='sethora' defaultSelected={false} onChange={(e) => setHora(e.target.checked)}>¿Selecciona Hora?</Switch>
                                         <Button type="submit" variant="shadow" className="w-full bg-green-700 text-slate-100">Agregar Fiscal</Button>
                                     </form>
                                 </div>

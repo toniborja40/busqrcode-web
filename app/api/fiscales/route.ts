@@ -10,7 +10,7 @@ if (!jwtName) {
   throw new Error("JWT_NAME is not defined in environment variables");
 }
 export async function POST(request: any) {
-  const { ubicacion, numero, username, password } =
+  const { ubicacion, numero, username, password, sethora } =
     await request.json();
    const cookieStore = await cookies();
    const token: any = cookieStore.get(jwtName as any);
@@ -35,6 +35,7 @@ export async function POST(request: any) {
        numero,
        username,
        password,
+       sethora,
      });
      const savedUnidad = await newUnidad.save();
      return NextResponse.json(savedUnidad);
@@ -44,8 +45,8 @@ export async function POST(request: any) {
 }
 
 export async function PUT(request: any) {
-  const { ubicacion, numero, _id, username, password } = await request.json();
-  console.log(ubicacion, numero, _id, username, password);
+  const { ubicacion, numero, _id, username, password, sethora } = await request.json();
+  console.log(ubicacion, numero, _id, username, password, sethora);
    const cookieStore = await cookies();
    const token: any = cookieStore.get(jwtName as any);
    try {
@@ -67,7 +68,7 @@ export async function PUT(request: any) {
      }
      const updatedUnidad = await fiscales.findOneAndUpdate(
        { _id },
-       { ubicacion, numero, password, username }
+       { ubicacion, numero, password, username, sethora }
      );
      if (!updatedUnidad) {
        return NextResponse.json(

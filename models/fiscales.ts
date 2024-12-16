@@ -24,6 +24,10 @@ const fiscales = new Schema(
         required: true,
         trim: true,
     },
+    sethora:{
+        type: Boolean,
+        default: false,
+    },
   },
   {
     timestamps: true,
