@@ -292,6 +292,8 @@ export default function Index({
         const fiscalAExists = rows.some((row: any) => row.fiscal === fiscalA);
         const fiscalBExists = rows.some((row: any) => row.fiscal === fiscalB);
        
+
+        //seccionar la comparación automáticamente por unidad independientemente de la ruta, definir los tiempos de comparación en minutos en las determinadas sitauciones
     if (fiscalAExists && fiscalBExists && timeCompare) {
      
      //hora_servidor es la hora a la que pasó el autobús frente al fiscal, o en su defecto la hora de salida que indicó el fiscal del terminal o de barrancas
@@ -344,10 +346,9 @@ export default function Index({
       if(fiscalA === fiscalB){ //Mismo fiscal
           for (let i = 0; i < rowsA.length-1; i++) {
             const diff = compareTimeDifference(rowsA[i].hora_servidor, rowsB[i+1].hora_servidor)
-              if (diff <= timeCompare) {
                   result.push({
-                      onTimeText: "A tiempo",  
-                      onTime: true,
+                      onTimeText: diff<= timeCompare? "A tiempo" : "Retardado",  
+                      onTime:diff <= timeCompare ? true: false,
                       key: rowsB[i+1].key,
                       hora_servidorA: rowsA[i].hora_servidor,
                       hora_telefonoA: rowsA[i].hora_telefono,
@@ -356,33 +357,17 @@ export default function Index({
                       hora_telefonoB: rowsB[i+1].hora_telefono,
                       fiscalB: rowsB[i+1].fiscal,
                       diff: diff,
+                      delay: diff <= timeCompare ? 0 : diff - timeCompare
                   });
-              } else {
-                  result.push({
-                      onTimeText: "Retardado",
-                      onTime: false,
-                      key: rowsB[i+1].key,
-                      hora_servidorA: rowsA[i].hora_servidor,
-                      hora_telefonoA: rowsA[i].hora_telefono,
-                      fiscalA: rowsA[i].fiscal,
-                      hora_servidorB: rowsB[i+1].hora_servidor,
-                      hora_telefonoB: rowsB[i+1].hora_telefono,
-                      fiscalB: rowsB[i+1].fiscal,
-                      diff: diff,
-                      delay: diff - timeCompare
-                  });
-              }
           }
           return result;
       }else if(rowsA.length > rowsB.length){ //rowsA.length MAYOR rowsB.length
         for (let i = 0; i < rowsA.length - 1; i++) {
           
           const diff = compareTimeDifference(rowsA[i].hora_servidor, rowsB[i].hora_servidor)
-          
-          if (diff <= timeCompare) {
             result.push({
-              onTimeText: "A tiempo",
-              onTime: true,
+              onTimeText: diff <= timeCompare ? "A tiempo" : "Retardado", 
+              onTime: diff <= timeCompare ? true : false,
               key: rowsB[i].key,
               hora_servidorA: rowsA[i].hora_servidor,
               hora_telefonoA: rowsA[i].hora_telefono,
@@ -391,32 +376,17 @@ export default function Index({
               hora_telefonoB: rowsB[i].hora_telefono,
               fiscalB: rowsB[i].fiscal,
               diff: diff ,
-              delay: 0
+              delay: diff <= timeCompare ? 0 : diff - timeCompare
             });
-          } else {
-            result.push({
-              onTimeText: "Retardado",
-              onTime: false,
-              key: rowsB[i].key,
-              hora_servidorA: rowsA[i].hora_servidor,
-              hora_telefonoA: rowsA[i].hora_telefono,
-              fiscalA: rowsA[i].fiscal,
-              hora_servidorB: rowsB[i].hora_servidor,
-              hora_telefonoB: rowsB[i].hora_telefono,
-              fiscalB: rowsB[i].fiscal,
-              diff: diff ,
-              delay: diff - timeCompare
-            });
-          }
+
         }
         return result;
       }else if(rowsA.length < rowsB.length){ //rowsA.length MENOR rowsB.length
          for (let i = 0; i < rowsA.length; i++) {
            const diff = compareTimeDifference(rowsA[i].hora_servidor, rowsB[i+1].hora_servidor)
-          if (diff <= timeCompare) {
             result.push({
-              onTimeText: "A tiempo",
-              onTime: true,
+              onTimeText: diff <= timeCompare ? "A tiempo" : "Retardado", 
+              onTime: diff <= timeCompare ? true : false,
               key: rowsB[i +1].key,
               hora_servidorA: rowsA[i].hora_servidor,
               hora_telefonoA: rowsA[i].hora_telefono,
@@ -425,33 +395,17 @@ export default function Index({
               hora_telefonoB: rowsB[i +1].hora_telefono,
               fiscalB: rowsB[i +1].fiscal,
               diff: diff,
-              delay: 0
+              delay: diff <= timeCompare ? 0 : diff - timeCompare
             });
-          } else {
-            result.push({
-              onTimeText: "Retardado",
-              onTime: false,
-              key: rowsB[i +1].key,
-              hora_servidorA: rowsA[i].hora_servidor,
-              hora_telefonoA: rowsA[i].hora_telefono,
-              fiscalA: rowsA[i].fiscal,
-              hora_servidorB: rowsB[i +1].hora_servidor,
-              hora_telefonoB: rowsB[i +1].hora_telefono,
-              fiscalB: rowsB[i +1].fiscal,
-              diff: diff,
-              delay: diff - timeCompare
-            });
-          }
         }
         return result;
       }else{ //rowsA.length IGUAL rowsB.length
           for (let i = 0; i < rowsA.length; i++) {
             const diff = compareTimeDifference(rowsA[i].hora_servidor, rowsB[i].hora_servidor)
             console.log(diff)
-        if (diff <= timeCompare) {
           result.push({
-            onTimeText: "A tiempo",
-            onTime: true,
+            onTimeText: diff <= timeCompare ? "A tiempo" : "Retardado", 
+            onTime: diff <= timeCompare ? true : false,
             key: rowsB[i].key,
             hora_servidorA: rowsA[i].hora_servidor,
             hora_telefonoA: rowsA[i].hora_telefono,
@@ -460,23 +414,8 @@ export default function Index({
             hora_telefonoB: rowsB[i].hora_telefono,
             fiscalB: rowsB[i].fiscal,
             diff: diff ,
-            delay: 0
+            delay: diff <= timeCompare ? 0 : diff - timeCompare
           });
-        } else {
-          result.push({
-            onTimeText: "Retardado",
-            onTime: false,
-            key: rowsB[i].key,
-            hora_servidorA: rowsA[i].hora_servidor,
-            hora_telefonoA: rowsA[i].hora_telefono,
-            fiscalA: rowsA[i].fiscal,
-            hora_servidorB: rowsB[i].hora_servidor,
-            hora_telefonoB: rowsB[i].hora_telefono,
-            fiscalB: rowsB[i].fiscal,
-            diff: diff,
-            delay: (diff) - timeCompare
-          });
-        }
       }
       return result;
         }
