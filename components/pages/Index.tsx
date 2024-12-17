@@ -100,7 +100,34 @@ export default function Index({
     hours = hours % 12;
     hours = hours ? hours : 12; // the hour '0' should be '12'
     const strHours = String(hours).padStart(2, "0");
-    return `  ${strHours}:${minutes} ${ampm}`;
+    return `${strHours}:${minutes} ${ampm}`;
+  };
+  const compareTimeDifference = (time1: string, time2: string): number => {
+    // Función para convertir hora en formato hh:mm AM/PM a objeto Date
+    const convertTo24HourFormat = (time: string): Date => {
+      const [timePart, modifier] = time.split(' ');
+      let [hours, minutes] = timePart.split(':').map(Number);
+
+      if (modifier === 'PM' && hours !== 12) {
+        hours += 12;
+      }
+      if (modifier === 'AM' && hours === 12) {
+        hours = 0;
+      }
+
+      const date = new Date();
+      date.setHours(hours, minutes, 0, 0);
+      return date;
+    };
+
+    const date1 = convertTo24HourFormat(time1);
+    const date2 = convertTo24HourFormat(time2);
+
+    // Calcular la diferencia en minutos
+    const diffInMs = Math.abs(date1.getTime() - date2.getTime());
+    const diffInMinutes = Math.floor(diffInMs / 60000);
+
+    return diffInMinutes;
   };
 
   //Comparación de datos
@@ -113,16 +140,28 @@ export default function Index({
     const ruta = rutas_.filter((r: any) => r._id === timestamp.id_ruta);
     const fiscal = fiscales_.filter((f: any) => f._id === timestamp.id_fiscal);
     const unidad = unidades_.filter((u: any) => u._id === timestamp.id_unidad);
-      console.log(formatHour(timestamp.timestamp_salida))
-    return {
-      key: timestamp._id,
-      hora_date: formatDate(timestamp.createdAt),
-      hora_servidor: formatHour(timestamp.createdAt),
-      hora_telefono: formatHour(timestamp.timestamp_telefono),
-      unidad: unidad[0].numero,
-      ruta: ruta[0].nombre,
-      fiscal: fiscal[0].ubicacion,
-    };
+     if(timestamp.timestamp_salida === null){
+       return {
+         key: timestamp._id,
+         hora_date: formatDate(timestamp.createdAt),
+         hora_servidor: formatHour(timestamp.createdAt),
+         hora_telefono: formatHour(timestamp.timestamp_telefono),
+         unidad: unidad[0].numero,
+         ruta: ruta[0].nombre,
+         fiscal: fiscal[0].ubicacion,
+       };
+     }else{
+       return {
+         key: timestamp._id,
+         hora_date: formatDate(timestamp.createdAt),
+         hora_servidor: formatHour(timestamp.createdAt),
+        //  hora_servidor: formatHour(timestamp.timestamp_salida),
+         hora_telefono: formatHour(timestamp.timestamp_telefono),
+         unidad: unidad[0].numero,
+         ruta: ruta[0].nombre,
+         fiscal: fiscal[0].ubicacion,
+        };
+      }
   
   });
   let rows = getTimestamps.filter((timestamp: any) => {
@@ -133,12 +172,12 @@ export default function Index({
   let columns = [
     {
       key: "hora_servidor",
-      label: "Hora Servidor",
+      label: "Hora",
     },
-    {
-      key: "hora_telefono",
-      label: "Hora Teléfono",
-    },
+    // {
+    //   key: "hora_telefono",
+    //   label: "Hora Teléfono",
+    // },
     {
       key: "unidad",
       label: "Unidad",
@@ -156,12 +195,12 @@ export default function Index({
     columns = [
       {
         key: "hora_servidor",
-        label: "Hora Servidor",
+        label: "Hora",
       },
-      {
-        key: "hora_telefono",
-        label: "Hora Teléfono",
-      },
+      // {
+      //   key: "hora_telefono",
+      //   label: "Hora Teléfono",
+      // },
       {
         key: "unidad",
         label: "Unidad",
@@ -192,12 +231,12 @@ export default function Index({
     columns = [
       {
         key: "hora_servidor",
-        label: "Hora Servidor",
+        label: "Hora",
       },
-      {
-        key: "hora_telefono",
-        label: "Hora Teléfono",
-      },
+      // {
+      //   key: "hora_telefono",
+      //   label: "Hora Teléfono",
+      // },
       {
         key: "unidad",
         label: "Unidad",
@@ -254,11 +293,12 @@ export default function Index({
         const fiscalBExists = rows.some((row: any) => row.fiscal === fiscalB);
        
     if (fiscalAExists && fiscalBExists && timeCompare) {
- 
      
+     //hora_servidor es la hora a la que pasó el autobús frente al fiscal, o en su defecto la hora de salida que indicó el fiscal del terminal o de barrancas
     const getTimestampsA: any[] = rows.map((timestamp: any) => {
       return {
         key: timestamp.key,
+        unidad: timestamp.unidad,
         hora_servidor: timestamp.hora_servidor,
         hora_telefono: timestamp.hora_telefono,
         fiscal: timestamp.fiscal,
@@ -266,13 +306,14 @@ export default function Index({
       };
     });
     let rowsA = getTimestampsA.filter((timestamp: any) => {
-      let registros = timestamp.hora_servidor.includes(fecha);
+      let registros = timestamp.hora_servidor
       return registros;
     });
     rowsA = rowsA.filter((timestamp: any) => timestamp.fiscal === fiscalA);
     const getTimestampsB: any[] = rows.map((timestamp: any) => {
       return {
         key: timestamp.key,
+        unidad: timestamp.unidad,
         hora_servidor: timestamp.hora_servidor,
         hora_telefono: timestamp.hora_telefono,
         fiscal: timestamp.fiscal,
@@ -280,11 +321,11 @@ export default function Index({
       };
     });
     let rowsB = getTimestampsB.filter((timestamp: any) => {
-      let registros = timestamp.hora_servidor.includes(fecha);
+      let registros = timestamp.hora_servidor
       return registros;
     });
     rowsB = rowsB.filter((timestamp: any) => timestamp.fiscal === fiscalB);
-
+    console.log(rowsA, rowsB);
     const compare = (rowsA: any, rowsB: any, timeCompare: any) => {
       let result: {
         onTimeText: string;
@@ -302,11 +343,8 @@ export default function Index({
 
       if(fiscalA === fiscalB){ //Mismo fiscal
           for (let i = 0; i < rowsA.length-1; i++) {
-              const diff = Math.abs(
-                  new Date(rowsA[i].hora_servidor).getTime() -
-                  new Date(rowsB[i+1].hora_servidor).getTime()
-              );
-              if (diff <= timeCompare * 60000) {
+            const diff = compareTimeDifference(rowsA[i].hora_servidor, rowsB[i+1].hora_servidor)
+              if (diff <= timeCompare) {
                   result.push({
                       onTimeText: "A tiempo",  
                       onTime: true,
@@ -317,7 +355,7 @@ export default function Index({
                       hora_servidorB: rowsB[i+1].hora_servidor,
                       hora_telefonoB: rowsB[i+1].hora_telefono,
                       fiscalB: rowsB[i+1].fiscal,
-                      diff: diff / 60000,
+                      diff: diff,
                   });
               } else {
                   result.push({
@@ -330,19 +368,18 @@ export default function Index({
                       hora_servidorB: rowsB[i+1].hora_servidor,
                       hora_telefonoB: rowsB[i+1].hora_telefono,
                       fiscalB: rowsB[i+1].fiscal,
-                      diff: diff / 60000,
-                      delay: (diff / 60000) - timeCompare
+                      diff: diff,
+                      delay: diff - timeCompare
                   });
               }
           }
           return result;
       }else if(rowsA.length > rowsB.length){ //rowsA.length MAYOR rowsB.length
         for (let i = 0; i < rowsA.length - 1; i++) {
-          const diff = Math.abs(
-            new Date(rowsA[i].hora_servidor).getTime() -
-            new Date(rowsB[i].hora_servidor).getTime()
-          );
-          if (diff <= timeCompare * 60000) {
+          
+          const diff = compareTimeDifference(rowsA[i].hora_servidor, rowsB[i].hora_servidor)
+          
+          if (diff <= timeCompare) {
             result.push({
               onTimeText: "A tiempo",
               onTime: true,
@@ -353,7 +390,7 @@ export default function Index({
               hora_servidorB: rowsB[i].hora_servidor,
               hora_telefonoB: rowsB[i].hora_telefono,
               fiscalB: rowsB[i].fiscal,
-              diff: diff / 60000,
+              diff: diff ,
               delay: 0
             });
           } else {
@@ -367,19 +404,16 @@ export default function Index({
               hora_servidorB: rowsB[i].hora_servidor,
               hora_telefonoB: rowsB[i].hora_telefono,
               fiscalB: rowsB[i].fiscal,
-              diff: diff / 60000,
-              delay: (diff / 60000) - timeCompare
+              diff: diff ,
+              delay: diff - timeCompare
             });
           }
         }
         return result;
       }else if(rowsA.length < rowsB.length){ //rowsA.length MENOR rowsB.length
          for (let i = 0; i < rowsA.length; i++) {
-          const diff = Math.abs(
-            new Date(rowsA[i].hora_servidor).getTime() -
-            new Date(rowsB[i +1].hora_servidor).getTime()
-          );
-          if (diff <= timeCompare * 60000) {
+           const diff = compareTimeDifference(rowsA[i].hora_servidor, rowsB[i+1].hora_servidor)
+          if (diff <= timeCompare) {
             result.push({
               onTimeText: "A tiempo",
               onTime: true,
@@ -390,7 +424,7 @@ export default function Index({
               hora_servidorB: rowsB[i +1].hora_servidor,
               hora_telefonoB: rowsB[i +1].hora_telefono,
               fiscalB: rowsB[i +1].fiscal,
-              diff: diff / 60000,
+              diff: diff,
               delay: 0
             });
           } else {
@@ -404,19 +438,17 @@ export default function Index({
               hora_servidorB: rowsB[i +1].hora_servidor,
               hora_telefonoB: rowsB[i +1].hora_telefono,
               fiscalB: rowsB[i +1].fiscal,
-              diff: diff / 60000,
-              delay: (diff / 60000) - timeCompare
+              diff: diff,
+              delay: diff - timeCompare
             });
           }
         }
         return result;
       }else{ //rowsA.length IGUAL rowsB.length
           for (let i = 0; i < rowsA.length; i++) {
-              const diff = Math.abs(
-          new Date(rowsA[i].hora_servidor).getTime() -
-            new Date(rowsB[i].hora_servidor).getTime()
-        );
-        if (diff <= timeCompare * 60000) {
+            const diff = compareTimeDifference(rowsA[i].hora_servidor, rowsB[i].hora_servidor)
+            console.log(diff)
+        if (diff <= timeCompare) {
           result.push({
             onTimeText: "A tiempo",
             onTime: true,
@@ -427,7 +459,7 @@ export default function Index({
             hora_servidorB: rowsB[i].hora_servidor,
             hora_telefonoB: rowsB[i].hora_telefono,
             fiscalB: rowsB[i].fiscal,
-            diff: diff / 60000,
+            diff: diff ,
             delay: 0
           });
         } else {
@@ -441,8 +473,8 @@ export default function Index({
             hora_servidorB: rowsB[i].hora_servidor,
             hora_telefonoB: rowsB[i].hora_telefono,
             fiscalB: rowsB[i].fiscal,
-            diff: diff / 60000,
-            delay: (diff / 60000) - timeCompare
+            diff: diff,
+            delay: (diff) - timeCompare
           });
         }
       }
@@ -453,6 +485,9 @@ export default function Index({
       rows = rows.map((row: any) => {
         const comparedTime = comparedTimes.find((ct: any) => ct.key === row.key);
         if (comparedTime) {
+          console.log(  
+            comparedTime
+          )
           return {
             ...row,
             onTime: comparedTime.onTime,
