@@ -12,7 +12,7 @@ export async function POST(request: any) {
 
     const findFiscal = await fiscales.findOne({ _id: id_fiscal });
 
-      if(!findFiscal.sethora){
+      if(findFiscal.sethora){
         const timestamp = new timestamps({
           id_ruta,
           id_unidad,
