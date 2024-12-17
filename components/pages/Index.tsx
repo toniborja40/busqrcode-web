@@ -113,6 +113,7 @@ export default function Index({
     const ruta = rutas_.filter((r: any) => r._id === timestamp.id_ruta);
     const fiscal = fiscales_.filter((f: any) => f._id === timestamp.id_fiscal);
     const unidad = unidades_.filter((u: any) => u._id === timestamp.id_unidad);
+      console.log(formatHour(timestamp.timestamp_salida))
     return {
       key: timestamp._id,
       hora_date: formatDate(timestamp.createdAt),
@@ -122,6 +123,7 @@ export default function Index({
       ruta: ruta[0].nombre,
       fiscal: fiscal[0].ubicacion,
     };
+  
   });
   let rows = getTimestamps.filter((timestamp: any) => {
     let registros = timestamp.hora_date.includes(fecha);
