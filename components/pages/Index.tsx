@@ -153,9 +153,9 @@ export default function Index({
      }else{
        return {
          key: timestamp._id,
-         hora_date: formatDate(timestamp.createdAt),
-         hora_servidor: formatHour(timestamp.createdAt),
-        //  hora_servidor: formatHour(timestamp.timestamp_salida),
+         hora_date: formatDate(timestamp.timestamp_salida),
+        //  hora_servidor: formatHour(timestamp.createdAt),
+         hora_servidor: formatHour(timestamp.timestamp_salida),
          hora_telefono: formatHour(timestamp.timestamp_telefono),
          unidad: unidad[0].numero,
          ruta: ruta[0].nombre,
@@ -168,6 +168,8 @@ export default function Index({
     let registros = timestamp.hora_date.includes(fecha);
     return registros;
   });
+
+  rows.sort((a: any, b: any) => new Date(a.hora_date).getTime() - new Date(b.hora_date).getTime());
 
   let columns = [
     {
