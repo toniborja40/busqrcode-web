@@ -59,6 +59,7 @@ export default function Index({
   const [fiscal, setFiscal] = useState<any>(null);
   const [horario, setHorario] = useState<any>(null);
   const [timestamps_, setTimestamps_] = useState<any>([]);
+  const [showRows, setShowRows] = useState(false);
 
 
   useEffect(() => {
@@ -171,6 +172,7 @@ export default function Index({
 
   rows.sort((a: any, b: any) => new Date(a.hora_date).getTime() - new Date(b.hora_date).getTime());
 
+  //filtrado de datos
   let columns = [
     {
       key: "hora_servidor",
@@ -272,6 +274,8 @@ export default function Index({
   } else if (unidad) {
     rows = rows.filter((timestamp: any) => timestamp.unidad == unidad);
   }
+
+  //Función para resetear los filtros
   const resetFilter = () => {
     setUnidad(null);
     setRuta(null);
@@ -296,9 +300,59 @@ export default function Index({
        
 
         //seccionar la comparación automáticamente por unidad independientemente de la ruta, definir los tiempos de comparación en minutos en las determinadas sitauciones
+
+  if (!ruta && !unidad && !fiscal) {
+    const getTimestamps: any[] = rows.map((timestamp: any) => {
+      return {
+        key: timestamp.key,
+        unidad: timestamp.unidad,
+        hora_servidor: timestamp.hora_servidor,
+        hora_telefono: timestamp.hora_telefono,
+        fiscal: timestamp.fiscal,
+        ruta: timestamp.ruta,
+      };
+    });
+
+    // Lista de todas las unidades que existen en el array de timestamps
+    const unidades = [...new Set(getTimestamps.map((timestamp: any) => timestamp.unidad))].sort((a, b) => a - b);
+    console.log("Unidades ordenadas:", unidades);
+
+    // Función para comparar registros
+    const compareTimestamps = (timestamps: any[]) => {
+      const grouped = timestamps.reduce((acc: any, timestamp: any) => {
+        const key = `${timestamp.unidad}-${timestamp.ruta}`;
+        if (!acc[key]) {
+          acc[key] = [];
+        }
+        acc[key].push(timestamp);
+        return acc;
+      }, {});
+
+      // Ordenar las claves de los grupos por el número de unidad
+      const sortedKeys = Object.keys(grouped).sort((a, b) => {
+        const unitA = parseInt(a.split('-')[0], 10);
+        const unitB = parseInt(b.split('-')[0], 10);
+        return unitA - unitB;
+      });
+      sortedKeys.forEach((key) => {
+        const group = grouped[key];
+        const fiscales = new Set(group.map((timestamp: any) => timestamp.fiscal));
+        if (fiscales.size > 1) {
+          console.log(`Unidad y ruta coinciden con diferentes fiscales: ${key}`);
+          console.log(group);
+        }
+      });
+    };
+
+    // Llamar a la función de comparación
+    compareTimestamps(getTimestamps);
+  }
+      //haz una función que me compare todos los registros de getTimestamps y me devuelva un console log si getTimestamps.unidad y getTimestamps.ruta coinciden siempre y cuando getTimestamps.fiscal sean diferentes
+
     if (fiscalAExists && fiscalBExists && timeCompare) {
      
      //hora_servidor es la hora a la que pasó el autobús frente al fiscal, o en su defecto la hora de salida que indicó el fiscal del terminal o de barrancas
+
     const getTimestampsA: any[] = rows.map((timestamp: any) => {
       return {
         key: timestamp.key,
@@ -310,7 +364,7 @@ export default function Index({
       };
     });
     let rowsA = getTimestampsA.filter((timestamp: any) => {
-      let registros = timestamp.hora_servidor
+      let registros = timestamp.hora_servidor  //ponerle alguna condición 
       return registros;
     });
     rowsA = rowsA.filter((timestamp: any) => timestamp.fiscal === fiscalA);
@@ -325,7 +379,7 @@ export default function Index({
       };
     });
     let rowsB = getTimestampsB.filter((timestamp: any) => {
-      let registros = timestamp.hora_servidor
+      let registros = timestamp.hora_servidor  //ponerle alguna condición 
       return registros;
     });
     rowsB = rowsB.filter((timestamp: any) => timestamp.fiscal === fiscalB);
@@ -547,15 +601,21 @@ export default function Index({
                     </option>
                   ))}
                 </select>
-              </div>
 
+              </div>
+              <div className='flex justify-end items-end gap-4'>
               <Button onClick={resetFilter} className="bg-sky-600 font-bold">
                 Reset
               </Button>
+                <Button onClick={() => setShowRows(!showRows)} className="bg-sky-600 font-bold">
+                  {showRows ? "Ocultar Registros" : "Mostrar Registros"}
+                </Button>
+              </div>
             </CardBody>
           </Card>
         </div>
         {/* body*/}
+          <h1 className="text-xl font-bold ">Registros diarios</h1>
         <div className={classNames("grid grid-cols-1 md:grid-cols-3 gap-4")}>
           <div
             className={classNames("flex gap-3", {
@@ -569,7 +629,7 @@ export default function Index({
                   <TableColumn key={column.key}>{column.label}</TableColumn>
                 )}
               </TableHeader>
-              <TableBody items={rows}>
+              <TableBody items={showRows?rows:[]}>
                 {(item) => (
                   <TableRow key={item.key} className={classNames('rounded',{
                     "bg-red-700": item.onTime === false,
@@ -586,7 +646,7 @@ export default function Index({
               </TableBody>
             </Table>
           </div>
-          { ruta && (
+          {/* ruta && (
             <div>
               <div>
                 <Card>
@@ -595,26 +655,7 @@ export default function Index({
                     <Divider />
                   </div>
                   <CardBody className="p-5 flex flex-wrap flex-row gap-6 justify-center items-center">
-                    {/* <div>
-                                    <label htmlFor="unidadCompare" className="block text-sm font-medium dark:text-slate-100 text-gray-700">Unidad</label>
-                                    <select  //hacer un SELECT
-                                        id="Compare"
-                                        value={unidadCompare ? unidadCompare : ''}
-                                        onChange={(e) => {
-                                            setUnidadCompare(e.target.value)
-                                        }}
-                                        className="mt-1 block w-full pl-3 pr-8 py-2 text-base border border-black focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                                    >
-                                        <option value="" disabled>
-                                            Elige una Unidad 
-                                        </option>
-                                        {unidades_.map((unidad: any) => (
-                                            <option key={unidad._id} value={unidad.numero}>
-                                                {unidad.numero}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div> */}
+                  
                     <div>
                       <label
                         htmlFor="fiscalA"
@@ -687,7 +728,11 @@ export default function Index({
                 </Card>
               </div>
             </div>
-          )}
+          ) */}
+          {/* mostrar registros ordenados */}
+          <div className=''>
+            <h1 className="text-xl font-bold ">Registros diarios</h1>
+          </div>
         </div>
       </section>
     </>
