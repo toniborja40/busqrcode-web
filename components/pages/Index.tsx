@@ -12,12 +12,15 @@ import {
   DatePicker,
   Button,
   Divider,
+  CardHeader,
 } from "@nextui-org/react";
 import Link from "next/link";
 import classNames from "classnames";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { group } from "console";
+import {ScrollUpIcon}  from "../icons";
 interface IndexProps {
   horarios?: any;
   rutas?: any;
@@ -60,18 +63,41 @@ export default function Index({
   const [horario, setHorario] = useState<any>(null);
   const [timestamps_, setTimestamps_] = useState<any>([]);
   const [showRows, setShowRows] = useState(false);
-
-
+  const [showOrden, setShowOrden] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [unidadesOrdenadas, setUnidadesOrdenadas] = useState<any>([]);
+  const [isAtTop, setIsAtTop] = useState(true);
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.post("/api/timestamps", {fecha:fecha});
-        setTimestamps_(response.data);
-      } catch (error) {
-        console.log('error', fecha)
-        console.log(error)
-      }
+    const handleScroll = () => {
+      setIsAtTop(window.scrollY === 0);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+
+  const scrollUp = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  }
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.post("/api/timestamps", { fecha: fecha });
+      setTimestamps_(response.data);
+    } catch (error) {
+      console.log('error', fecha);
+      console.log(error);
+    } finally {
+      setLoading(false);
     }
+  };
+  useEffect(() => {
     fetchData();
   }, [fecha]);
 
@@ -173,6 +199,40 @@ export default function Index({
   rows.sort((a: any, b: any) => new Date(a.hora_date).getTime() - new Date(b.hora_date).getTime());
 
   //filtrado de datos
+  let columns1 = [
+    {
+      key: "hora_servidor",
+      label: "Hora",
+    },
+    // {
+    //   key: "hora_telefono",
+    //   label: "Hora Teléfono",
+    // },
+    {
+      key: "unidad",
+      label: "Unidad",
+    },
+    {
+      key: "ruta",
+      label: "Ruta",
+    },
+    {
+      key: "fiscal",
+      label: "Fiscal",
+    },
+    {
+      key: "onTimeText",
+      label: "On Time",
+    },
+    {
+      key: "diff",
+      label: "Diferencia (min)",
+    },
+    {
+      key: "delay",
+      label: "Retraso (min)",
+    }
+  ];
   let columns = [
     {
       key: "hora_servidor",
@@ -301,8 +361,8 @@ export default function Index({
 
         //seccionar la comparación automáticamente por unidad independientemente de la ruta, definir los tiempos de comparación en minutos en las determinadas sitauciones
 
-  if (!ruta && !unidad && !fiscal) {
-    const getTimestamps: any[] = rows.map((timestamp: any) => {
+
+    const setTimestamps: any[] = rows.map((timestamp: any) => {
       return {
         key: timestamp.key,
         unidad: timestamp.unidad,
@@ -314,8 +374,9 @@ export default function Index({
     });
 
     // Lista de todas las unidades que existen en el array de timestamps
-    const unidades = [...new Set(getTimestamps.map((timestamp: any) => timestamp.unidad))].sort((a, b) => a - b);
-    console.log("Unidades ordenadas:", unidades);
+    const unidadesordenadas = [...new Set(setTimestamps.map((timestamp: any) => timestamp.unidad))].sort((a, b) => a - b);
+    console.log("Unidades ordenadas:", unidadesordenadas);
+    // setUnidadesOrdenadas(unidadesordenadas);
 
     // Función para comparar registros
     const compareTimestamps = (timestamps: any[]) => {
@@ -334,20 +395,29 @@ export default function Index({
         const unitB = parseInt(b.split('-')[0], 10);
         return unitA - unitB;
       });
+      let sortedRegistros: any[] = []
       sortedKeys.forEach((key) => {
         const group = grouped[key];
         const fiscales = new Set(group.map((timestamp: any) => timestamp.fiscal));
         if (fiscales.size > 1) {
-          console.log(`Unidad y ruta coinciden con diferentes fiscales: ${key}`);
-          console.log(group);
+          // console.log(`Unidad y ruta coinciden con diferentes fiscales: ${key}`);
+          // console.log(group);
+          const sorted = {
+            title: key,
+            group,
+          }
+          sortedRegistros.push(sorted)
         }
-      });
-    };
 
+
+      });
+      return sortedRegistros;
+    };
     // Llamar a la función de comparación
-    compareTimestamps(getTimestamps);
-  }
-      //haz una función que me compare todos los registros de getTimestamps y me devuelva un console log si getTimestamps.unidad y getTimestamps.ruta coinciden siempre y cuando getTimestamps.fiscal sean diferentes
+    const registrosOrdenados = compareTimestamps(setTimestamps);
+    console.log(registrosOrdenados);
+    
+      //algoritmo que le agregue a registrosOrdenados si están a tiempo o no y la diferencia de tiempo
 
     if (fiscalAExists && fiscalBExists && timeCompare) {
      
@@ -495,8 +565,8 @@ export default function Index({
       });
   } 
   return (
-    <>
-      <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
+    <div>
+     <section className="flex flex-col items-center justify-center gap-4">
         <div className="inline-block max-w-xl text-center justify-center">
           <h1 className="text-2xl font-bold">Horarios Fiscales</h1>
         </div>
@@ -601,20 +671,75 @@ export default function Index({
                     </option>
                   ))}
                 </select>
-
               </div>
               <div className='flex justify-end items-end gap-4'>
-              <Button onClick={resetFilter} className="bg-sky-600 font-bold">
-                Reset
-              </Button>
-                <Button onClick={() => setShowRows(!showRows)} className="bg-sky-600 font-bold">
-                  {showRows ? "Ocultar Registros" : "Mostrar Registros"}
+                <Button onClick={resetFilter} className="bg-sky-600 font-bold">
+                  Reset
                 </Button>
+                <Button onClick={() => setShowRows(!showRows)} className="bg-sky-600 font-bold">
+                  {showRows ? "Ocultar Lista" : "Mostrar Lista"}
+                </Button>
+
+                {todayDate.fecha == fecha ?(
+                  <>
+                  {loading ? <Button className="bg-sky-600 font-bold cursor-default">
+                    Cargando...
+                    </Button> : <Button onClick={fetchData} className="bg-sky-600 font-bold">
+                  Refrescar registros
+                </Button>}
+                </>
+                ):''}
+
+                <Button onClick={() => setShowOrden(!showOrden)} className="bg-sky-600 font-bold">
+                  {showOrden ? "Ocultar Registros Ordenados" : "Mostrar Registros Ordenados"}
+                </Button>
+
               </div>
             </CardBody>
           </Card>
         </div>
+     </section>
+     {showOrden && <section className='flex flex-col items-center justify-center gap-4'>
+        <h1 className="text-xl font-bold mt-4">Registros ordenados</h1>
+        <div className="p-5 grid grid-cols-2 gap-4 justify-center items-center">
+          {registrosOrdenados && registrosOrdenados.map((registro: any) => (
+              <Card className='' key={registro.title}>
+                  <CardHeader>
+                    <h1 className="font-bold text-lg">{registro.title}</h1>
+                  </CardHeader>
+                  <Divider/>
+                  <CardBody className='h-72'>
+                    <Table>
+                      <TableHeader columns={columns1}>
+                        {(column) => (
+                          <TableColumn key={column.key}>{column.label}</TableColumn>
+                        )}
+                      </TableHeader>
+                      <TableBody items={registro.group}>
+                        {(item) => (
+                          <TableRow key={(item as any).key} className={classNames('rounded', {
+                            "bg-red-700": (item as any).onTime === false,
+                          })}>
+                            {(columnKey) => (
+                              <TableCell>
+                                {/* <Link href={`/registros/${item.key}`}> */}
+                                {getKeyValue(item, columnKey)}
+                                {/* </Link> */}
+                              </TableCell>
+                            )}
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </CardBody>
+                </Card>
+          ))}
+        </div>
+      </section>}
+      <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
+       
         {/* body*/}
+          
           <h1 className="text-xl font-bold ">Registros diarios</h1>
         <div className={classNames("grid grid-cols-1 md:grid-cols-3 gap-4")}>
           <div
@@ -730,11 +855,31 @@ export default function Index({
             </div>
           ) */}
           {/* mostrar registros ordenados */}
-          <div className=''>
-            <h1 className="text-xl font-bold ">Registros diarios</h1>
-          </div>
+     
         </div>
       </section>
-    </>
+      <section>
+       
+      </section>
+        {!isAtTop && (
+      <div className=" fixed bottom-4 right-4 z-50">
+        {todayDate.fecha==fecha ?(
+          <>
+          {loading ? <Button className="bg-red-600 font-bold p-4 rounded-full shadow-lg cursor-default">
+            Cargando...
+            </Button> :  <Button onClick={fetchData} className="bg-red-600 font-bold p-4 rounded-full shadow-lg">
+       Refrescar registros
+        </Button>
+        }
+          </>
+            )
+        : ''}
+          <Button onClick={scrollUp} className="bg-sky-600 font-bold p-4 rounded-full shadow-lg m-4">
+            Subir
+            <ScrollUpIcon />
+          </Button>
+      </div>
+        )}
+    </div>
   );
 }
