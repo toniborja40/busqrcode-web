@@ -424,7 +424,7 @@ export default function Index({
               group[i + 1].delay = diff > 23 ? diff - 23 : 0;
             }
 
-            if (group[i].fiscal === "Terminal" && group[i + 2]?.fiscal === "3 Esquinas"){
+            if (group[i].fiscal == "Terminal" && group[i + 2]?.fiscal == "3 esquinas"){
               const time1 = convertToMinutes(group[i].hora_servidor);
               const time2 = convertToMinutes(group[i + 2].hora_servidor);
               const diff = time2 - time1;
@@ -433,7 +433,7 @@ export default function Index({
               group[i + 2].diff = diff;
               group[i + 2].delay = diff > 45 ? diff - 45 : 0;
             }
-            if (group[i].fiscal === 'Barrancas' && group[i + 1]?.fiscal === 'Panaderia') {
+            if (group[i].fiscal == 'Barrancas' && group[i + 1]?.fiscal == 'Panaderia') {
               const time1 = convertToMinutes(group[i].hora_servidor);
               const time2 = convertToMinutes(group[i + 1].hora_servidor);
               const diff = time2 - time1;
@@ -443,6 +443,15 @@ export default function Index({
               group[i + 1].onTimeText = diff <= threshold ? "A tiempo" : "Retardado";
               group[i + 1].diff = diff;
               group[i + 1].delay = diff > threshold ? diff - threshold : 0;
+            }
+            if (group[i].fiscal == "Terminal" && group[i + 2]?.fiscal == "Panaderia") {
+              const time1 = convertToMinutes(group[i].hora_servidor);
+              const time2 = convertToMinutes(group[i + 2].hora_servidor);
+              const diff = time2 - time1;
+              group[i + 2].onTime = diff <= 45;
+              group[i + 2].onTimeText = diff <= 45 ? "A tiempo" : "Retardado";
+              group[i + 2].diff = diff;
+              group[i + 2].delay = diff > 45 ? diff - 45 : 0;
             }
           }
 
