@@ -14,12 +14,10 @@ import {
   Divider,
   CardHeader,
 } from "@nextui-org/react";
-import Link from "next/link";
 import classNames from "classnames";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { group } from "console";
 import {ScrollUpIcon}  from "../icons";
 interface IndexProps {
   horarios?: any;
@@ -27,6 +25,7 @@ interface IndexProps {
   fiscales?: any;
   timestamps?: any;
   unidades?: any;
+  payload?:any;
 }
 
 const getTodayDate = () => {
@@ -45,6 +44,7 @@ export default function Index({
   fiscales,
   timestamps, 
   unidades,
+  payload,
 }: IndexProps) {
   const horarios_ = JSON.parse(horarios);
   const rutas_ = JSON.parse(rutas);
@@ -55,7 +55,6 @@ export default function Index({
   const unidades_ = JSON.parse(unidades).sort(
     (a: any, b: any) => a.numero - b.numero
   );
- 
   const [fecha, setFecha] = useState<any>(todayDate.fecha);
   const [unidad, setUnidad] = useState<any>(null);
   const [ruta, setRuta] = useState<any>(null);
@@ -65,7 +64,6 @@ export default function Index({
   const [showRows, setShowRows] = useState(false);
   const [showOrden, setShowOrden] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [unidadesOrdenadas, setUnidadesOrdenadas] = useState<any>([]);
   const [isAtTop, setIsAtTop] = useState(true);
   useEffect(() => {
     const handleScroll = () => {
@@ -400,15 +398,61 @@ export default function Index({
         const group = grouped[key];
         const fiscales = new Set(group.map((timestamp: any) => timestamp.fiscal));
         if (fiscales.size > 1) {
-          // console.log(`Unidad y ruta coinciden con diferentes fiscales: ${key}`);
-          // console.log(group);
+          // Convertir hora_servidor a minutos
+          const convertToMinutes = (timeString: string) => {
+            const [time, modifier] = timeString.split(' ');
+            let [hours, minutes] = time.split(':').map(Number);
+            if (modifier === 'PM' && hours !== 12) {
+              hours += 12;
+            }
+            if (modifier === 'AM' && hours === 12) {
+              hours = 0;
+            }
+            return hours * 60 + minutes;
+          };
+
+          // Comparar la posición 0 con la posición 1 solo si el primer fiscal es "Terminal" y el segundo es "Centro"
+          
+          for (let i = 0; i < group.length - 1; i++) {
+            if (group[i].fiscal === "Terminal" && group[i + 1].fiscal === "Centro") {
+              const time1 = convertToMinutes(group[i].hora_servidor);
+              const time2 = convertToMinutes(group[i + 1].hora_servidor);
+              const diff = time2 - time1;
+              group[i + 1].onTime = diff <= 23;
+              group[i + 1].onTimeText = diff <= 23 ? "A tiempo" : "Retardado";
+              group[i + 1].diff = diff;
+              group[i + 1].delay = diff > 23 ? diff - 23 : 0;
+            }
+
+            if (group[i].fiscal === "Terminal" && group[i + 2]?.fiscal === "3 Esquinas" && (group[i].registro === "Palo Gordo" && group[i + 2].registro === "Palo Gordo") || (group[i].registro === "Gallardin" && group[i + 2].registro === "Gallardin")|| (group[i].registro === "Seguro" && group[i + 2].registro === "Seguro")  ){
+              const time1 = convertToMinutes(group[i].hora_servidor);
+              const time2 = convertToMinutes(group[i + 2].hora_servidor);
+              const diff = time2 - time1;
+              group[i + 2].onTime = diff <= 45;
+              group[i + 2].onTimeText = diff <= 45 ? "A tiempo" : "Retardado";
+              group[i + 2].diff = diff;
+              group[i + 2].delay = diff > 45 ? diff - 45 : 0;
+            }
+            if (group[i].fiscal === 'Barrancas' && group[i + 1]?.fiscal === 'Panaderia') {
+              const time1 = convertToMinutes(group[i].hora_servidor);
+              const time2 = convertToMinutes(group[i + 1].hora_servidor);
+              const diff = time2 - time1;
+              const isBefore8am = time1 < 8 * 60; // 8am in minutes
+              const threshold = isBefore8am ? 12 : 14;
+              group[i + 1].onTime = diff <= threshold;
+              group[i + 1].onTimeText = diff <= threshold ? "A tiempo" : "Retardado";
+              group[i + 1].diff = diff;
+              group[i + 1].delay = diff > threshold ? diff - threshold : 0;
+            }
+          }
+
           const sorted = {
             title: key,
             group,
           }
           sortedRegistros.push(sorted)
         }
-
+        
 
       });
       return sortedRegistros;
@@ -591,6 +635,7 @@ export default function Index({
                     setFiscal(null);
                   }}
                   className="mt-1 block w-full pl-3 pr-2 py-2 text-base border border-black focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                  aria-label="Selector de fecha"
                 />
               </div>
               <div>
@@ -608,6 +653,7 @@ export default function Index({
                     setFiscal(null);
                   }}
                   className="mt-1 block w-full pl-3 pr-8 py-2 text-base border border-black focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                  aria-label="Selector de unidad"
                 >
                   <option value="" disabled>
                     Elige una unidad
@@ -623,6 +669,7 @@ export default function Index({
                 <label
                   htmlFor="ruta"
                   className="block text-sm font-medium dark:text-slate-100 text-gray-700"
+                  aria-label="Selector de ruta"
                 >
                   Ruta
                 </label>
@@ -634,6 +681,7 @@ export default function Index({
                     setFiscal(null);
                   }}
                   className="mt-1 block w-full pl-3 pr-8 py-2 text-base border border-black focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                  aria-label="Selector de ruta"
                 >
                   <option value="" disabled>
                     Elige una ruta
@@ -661,6 +709,7 @@ export default function Index({
                     setRuta(null);
                   }}
                   className="mt-1 block w-full pl-3 pr-8 py-2 text-base border border-black focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                  aria-label="Selector de fiscal"
                 >
                   <option value="" disabled>
                     Elige un fiscal
@@ -710,16 +759,17 @@ export default function Index({
                   <Divider/>
                   <CardBody className='h-72'>
                     <Table>
-                      <TableHeader columns={columns1}>
+                  <TableHeader columns={columns1} aria-label="Tabla">
                         {(column) => (
                           <TableColumn key={column.key}>{column.label}</TableColumn>
                         )}
                       </TableHeader>
-                      <TableBody items={registro.group}>
+                  <TableBody items={registro.group} aria-label="Tabla">
                         {(item) => (
                           <TableRow key={(item as any).key} className={classNames('rounded', {
                             "bg-red-700": (item as any).onTime === false,
-                          })}>
+                          })}
+                        aria-label="Tabla">
                             {(columnKey) => (
                               <TableCell>
                                 {/* <Link href={`/registros/${item.key}`}> */}
@@ -858,8 +908,21 @@ export default function Index({
      
         </div>
       </section>
-      <section>
-       
+      <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
+        <div>
+          <h1 className="text-xl font-bold">Lista de Unidades</h1>
+          <div>
+            <Card>
+                <CardBody className='flex flex-row gap-4'>
+                <ul className="flex flex-wrap gap-2">
+                      {unidadesordenadas && unidadesordenadas.map((unidad: any) => (
+                        <li key={unidad}>{unidad}</li>
+                      ))}
+                    </ul>
+                </CardBody>
+            </Card> 
+          </div>
+        </div>
       </section>
         {!isAtTop && (
       <div className=" fixed bottom-4 right-4 z-50">

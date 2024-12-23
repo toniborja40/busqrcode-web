@@ -7,6 +7,12 @@ export async function middleware(request: any) {
       try {
           const { payload } = await jwtVerify(jwt.value, new TextEncoder().encode(process.env.JWT_SECRET));
           console.log(payload)
+            if(payload.rol != 5){
+              if(request.nextUrl.pathname.includes("/unidades") || request.nextUrl.pathname.includes("/fiscales") || request.nextUrl.pathname.includes("/rutas") || request.nextUrl.pathname.includes("/horarios")){
+                return NextResponse.redirect(new URL("/", request.url));
+              }
+              }
+
     // Si el usuario está autenticado y está en la página de login, redirigir a la página principal
     if (request.nextUrl.pathname.includes("/login")) {
       return NextResponse.redirect(new URL("/", request.url));

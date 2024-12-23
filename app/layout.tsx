@@ -38,12 +38,16 @@ export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
-}){
+}) {
   const cookieStore = await cookies();
   const token: any = cookieStore.get(jwtName as any);
-  let verification = true;
+  let verification = false;
+  let rol = 0
   try {
-    jwt.verify(token.value, process.env.JWT_SECRET as Secret) as JwtPayload;
+    const payload = jwt.verify(token.value, process.env.JWT_SECRET as Secret) as JwtPayload;
+
+    console.log(payload)
+    rol = payload.rol
     verification = true;
   } catch (error) {
     verification = false
@@ -60,7 +64,7 @@ export default async function RootLayout({
       >
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
           <div className="relative flex flex-col h-screen">
-            {verification ?<> <Navbar_header />
+            {verification ?<> <Navbar_header verification={rol}/>
             <div className="flex justify-center items-center">
              {/* <SideBar /> */}
               <main className="container relative pt-8 px-6">
