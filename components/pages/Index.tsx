@@ -424,7 +424,7 @@ export default function Index({
               group[i + 1].delay = diff > 23 ? diff - 23 : 0;
             }
 
-            if (group[i].fiscal === "Terminal" && group[i + 2]?.fiscal === "3 Esquinas" && (group[i].registro === "Palo Gordo" && group[i + 2].registro === "Palo Gordo") || (group[i].registro === "Gallardin" && group[i + 2].registro === "Gallardin")|| (group[i].registro === "Seguro" && group[i + 2].registro === "Seguro")  ){
+            if (group[i].fiscal === "Terminal" && group[i + 2]?.fiscal === "3 Esquinas"){
               const time1 = convertToMinutes(group[i].hora_servidor);
               const time2 = convertToMinutes(group[i + 2].hora_servidor);
               const diff = time2 - time1;
