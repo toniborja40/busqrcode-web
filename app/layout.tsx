@@ -58,12 +58,12 @@ export default async function RootLayout({
       <head />
       <body
         className={clsx(
-          "min-h-screen bg-background font-sans antialiased",
+          "min-h-screen  bg-background font-sans antialiased",
           fontSans.variable,
         )}
       >
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
-          <div className="relative flex flex-col h-screen">
+          <div className="relative flex flex-col w-full ">
             {verification ?<> <Navbar_header verification={rol}/>
             <div className="flex justify-center items-center">
              {/* <SideBar /> */}

@@ -24,7 +24,7 @@ export default function Navbar_header(verification: any) {
   }
   console.log(verification)
   return (
-    <Navbar onMenuOpenChange={setIsMenuOpen} className=" grid grid-cols-2 bg-blue-950">
+    <Navbar onMenuOpenChange={setIsMenuOpen} className=" grid grid-cols-2 bg-blue-950 w-full">
       <NavbarContent>
         <NavbarMenuToggle
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}

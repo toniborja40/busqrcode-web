@@ -643,7 +643,7 @@ export default function Index({
         </div>
         <div>
           <Card>
-            <CardBody className="p-5 flex flex-wrap flex-row gap-6 justify-center items-center">
+            <CardBody className=" p-5 flex flex-wrap flex-row gap-6 justify-center items-center">
               <div>
                 <label
                   htmlFor="fecha"
@@ -665,7 +665,7 @@ export default function Index({
                   aria-label="Selector de fecha"
                 />
               </div>
-              <div>
+              <div className='hidden sm:block'>
                 <label
                   htmlFor="unidad"
                   className="block text-sm font-medium dark:text-slate-100 text-gray-700"
@@ -692,7 +692,7 @@ export default function Index({
                   ))}
                 </select>
               </div>
-              <div>
+              <div className='hidden sm:block'>
                 <label
                   htmlFor="ruta"
                   className="block text-sm font-medium dark:text-slate-100 text-gray-700"
@@ -720,7 +720,7 @@ export default function Index({
                   ))}
                 </select>
               </div>
-              <div>
+              <div className='hidden sm:block'>
                 <label
                   htmlFor="fiscal"
                   className="block text-sm font-medium dark:text-slate-100 text-gray-700"
@@ -748,7 +748,7 @@ export default function Index({
                   ))}
                 </select>
               </div>
-              <div className='flex justify-end items-end gap-4'>
+              <div className='flex flex-col sm:flex-row sm:justify-end sm:items-end justify-center items-center gap-4'>
                 <Button onClick={resetFilter} className="bg-sky-600 font-bold">
                   Reset
                 </Button>
@@ -777,7 +777,7 @@ export default function Index({
      </section>
      {showOrden && <section className='flex flex-col items-center justify-center gap-4'>
         <h1 className="text-xl font-bold mt-4">Registros ordenados</h1>
-        <div className="p-5 grid grid-cols-2 gap-4 justify-center items-center">
+        <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4 justify-center items-center">
           {registrosOrdenados && registrosOrdenados.map((registro: any) => (
               <Card className='' key={registro.title}>
                   <CardHeader>
