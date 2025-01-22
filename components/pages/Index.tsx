@@ -199,10 +199,10 @@ export default function Index({
 
   //filtrado de datos
   let columns1 = [
-    // {
-    //   key: "hora_servidor",
-    //   label: "Hora",
-    // },
+    {
+      key: "hora_servidor",
+      label: "Hora Servidor",
+    },
     {
       key: "hora_telefono",
       label: "Hora Teléfono",
@@ -233,14 +233,14 @@ export default function Index({
     }
   ];
   let columns = [
-    // {
-    //   key: "hora_servidor",
-    //   label: "Hora",
-    // },
     {
-      key: "hora_telefono",
-      label: "Hora Teléfono",
+      key: "hora_servidor",
+      label: "Hora",
     },
+    // {
+    //   key: "hora_telefono",
+    //   label: "Hora Teléfono",
+    // },
     {
       key: "unidad",
       label: "Unidad",
