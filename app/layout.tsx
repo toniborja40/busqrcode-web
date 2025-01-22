@@ -62,7 +62,7 @@ export default async function RootLayout({
           fontSans.variable,
         )}
       >
-        <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
+        <Providers themeProps={{ attribute: "class", defaultTheme: "light" }}>
           <div className="relative flex flex-col w-full ">
             {verification ?<> <Navbar_header verification={rol}/>
             <div className="flex ">
