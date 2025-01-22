@@ -537,7 +537,7 @@ export default function Index({
         const dataUrl = canvas.toDataURL('image/png');
         const link = document.createElement('a');
         link.href = dataUrl;
-        link.download = `${title} ${todayDate.fecha}.png`;
+        link.download = `${title} ${fecha}.png`;
         link.click();
 
         // Limpiar el contenedor oculto
