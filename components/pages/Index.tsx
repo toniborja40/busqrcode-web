@@ -15,7 +15,8 @@ import {
   CardHeader,
 } from "@nextui-org/react";
 import classNames from "classnames";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import html2canvas from 'html2canvas';
 import { toast } from "react-toastify";
 import axios from "axios";
 import {ScrollUpIcon}  from "../icons";
@@ -198,14 +199,14 @@ export default function Index({
 
   //filtrado de datos
   let columns1 = [
-    {
-      key: "hora_servidor",
-      label: "Hora",
-    },
     // {
-    //   key: "hora_telefono",
-    //   label: "Hora Teléfono",
+    //   key: "hora_servidor",
+    //   label: "Hora",
     // },
+    {
+      key: "hora_telefono",
+      label: "Hora Teléfono",
+    },
     {
       key: "unidad",
       label: "Unidad",
@@ -232,14 +233,14 @@ export default function Index({
     }
   ];
   let columns = [
-    {
-      key: "hora_servidor",
-      label: "Hora",
-    },
     // {
-    //   key: "hora_telefono",
-    //   label: "Hora Teléfono",
+    //   key: "hora_servidor",
+    //   label: "Hora",
     // },
+    {
+      key: "hora_telefono",
+      label: "Hora Teléfono",
+    },
     {
       key: "unidad",
       label: "Unidad",
@@ -376,6 +377,13 @@ export default function Index({
     console.log("Unidades ordenadas:", unidadesordenadas);
     // setUnidadesOrdenadas(unidadesordenadas);
 
+
+
+
+
+
+
+
     // Función para comparar registros
     const compareTimestamps = (timestamps: any[]) => {
       const grouped = timestamps.reduce((acc: any, timestamp: any) => {
@@ -416,7 +424,7 @@ export default function Index({
           for (let i = 0; i < group.length - 1; i++) {
             if (group[i].fiscal === "Terminal" && group[i + 1].fiscal === "Centro") {
               const time1 = convertToMinutes(group[i].hora_servidor);
-              const time2 = convertToMinutes(group[i + 1].hora_servidor);
+              const time2 = convertToMinutes(group[i + 1].hora_telefono);
               const diff = time2 - time1;
               group[i + 1].onTime = diff <= 23;
               group[i + 1].onTimeText = diff <= 23 ? "A tiempo" : "Retardado";
@@ -426,7 +434,7 @@ export default function Index({
 
             if (group[i].fiscal == "Terminal" && group[i + 2]?.fiscal == "3 esquinas"){
               const time1 = convertToMinutes(group[i].hora_servidor);
-              const time2 = convertToMinutes(group[i + 2].hora_servidor);
+              const time2 = convertToMinutes(group[i + 2].hora_telefono);
               const diff = time2 - time1;
               group[i + 2].onTime = diff <= 45;
               group[i + 2].onTimeText = diff <= 45 ? "A tiempo" : "Retardado";
@@ -434,8 +442,8 @@ export default function Index({
               group[i + 2].delay = diff > 45 ? diff - 45 : 0;
             }
             if (group[i].fiscal == 'Barrancas' && group[i + 1]?.fiscal == 'Panaderia') {
-              const time1 = convertToMinutes(group[i].hora_servidor);
-              const time2 = convertToMinutes(group[i + 1].hora_servidor);
+              const time1 = convertToMinutes(group[i].hora_telefono);
+              const time2 = convertToMinutes(group[i + 1].hora_telefono);
               const diff = time2 - time1;
               const isBefore8am = time1 < 8 * 60; // 8am in minutes
               const threshold = isBefore8am ? 12 : 14;
@@ -446,7 +454,7 @@ export default function Index({
             }
             if (group[i].fiscal == "Terminal" && group[i + 1]?.fiscal == "3 esquinas") {
               const time1 = convertToMinutes(group[i].hora_servidor);
-              const time2 = convertToMinutes(group[i + 1].hora_servidor);
+              const time2 = convertToMinutes(group[i + 1].hora_telefono);
               const diff = time2 - time1;
               group[i + 1].onTime = diff <= 45;
               group[i + 1].onTimeText = diff <= 45 ? "A tiempo" : "Retardado";
@@ -455,7 +463,7 @@ export default function Index({
             }
             if (group[i].fiscal == "Terminal" && group[i + 2]?.fiscal == "Panaderia") {
               const time1 = convertToMinutes(group[i].hora_servidor);
-              const time2 = convertToMinutes(group[i + 2].hora_servidor);
+              const time2 = convertToMinutes(group[i + 2].hora_telefono);
               const diff = time2 - time1;
               group[i + 2].onTime = diff <= 45;
               group[i + 2].onTimeText = diff <= 45 ? "A tiempo" : "Retardado";
@@ -464,7 +472,7 @@ export default function Index({
             }
             if (group[i].fiscal == "Terminal" && group[i + 1]?.fiscal == "Panaderia") {
               const time1 = convertToMinutes(group[i].hora_servidor);
-              const time2 = convertToMinutes(group[i + 1].hora_servidor);
+              const time2 = convertToMinutes(group[i + 1].hora_telefono);
               const diff = time2 - time1;
               group[i + 1].onTime = diff <= 45;
               group[i + 1].onTimeText = diff <= 45 ? "A tiempo" : "Retardado";
@@ -484,157 +492,196 @@ export default function Index({
       });
       return sortedRegistros;
     };
+
+
+
+
+
+
     // Llamar a la función de comparación
     const registrosOrdenados = compareTimestamps(setTimestamps);
     console.log(registrosOrdenados);
     
       //algoritmo que le agregue a registrosOrdenados si están a tiempo o no y la diferencia de tiempo
 
-    if (fiscalAExists && fiscalBExists && timeCompare) {
+  //   if (fiscalAExists && fiscalBExists && timeCompare) {
      
-     //hora_servidor es la hora a la que pasó el autobús frente al fiscal, o en su defecto la hora de salida que indicó el fiscal del terminal o de barrancas
+  //    //hora_servidor es la hora a la que pasó el autobús frente al fiscal, o en su defecto la hora de salida que indicó el fiscal del terminal o de barrancas
 
-    const getTimestampsA: any[] = rows.map((timestamp: any) => {
-      return {
-        key: timestamp.key,
-        unidad: timestamp.unidad,
-        hora_servidor: timestamp.hora_servidor,
-        hora_telefono: timestamp.hora_telefono,
-        fiscal: timestamp.fiscal,
-        ruta: timestamp.ruta,
-      };
-    });
-    let rowsA = getTimestampsA.filter((timestamp: any) => {
-      let registros = timestamp.hora_servidor  //ponerle alguna condición 
-      return registros;
-    });
-    rowsA = rowsA.filter((timestamp: any) => timestamp.fiscal === fiscalA);
-    const getTimestampsB: any[] = rows.map((timestamp: any) => {
-      return {
-        key: timestamp.key,
-        unidad: timestamp.unidad,
-        hora_servidor: timestamp.hora_servidor,
-        hora_telefono: timestamp.hora_telefono,
-        fiscal: timestamp.fiscal,
-        ruta: timestamp.ruta,
-      };
-    });
-    let rowsB = getTimestampsB.filter((timestamp: any) => {
-      let registros = timestamp.hora_servidor  //ponerle alguna condición 
-      return registros;
-    });
-    rowsB = rowsB.filter((timestamp: any) => timestamp.fiscal === fiscalB);
-    console.log(rowsA, rowsB);
-    const compare = (rowsA: any, rowsB: any, timeCompare: any) => {
-      let result: {
-        onTimeText: string;
-        onTime: boolean;
-        key: any;
-        hora_servidorA: any;
-        hora_telefonoA: any;
-        fiscalA: any;
-        hora_servidorB: any;
-        hora_telefonoB: any;
-        fiscalB: any;
-        diff: number;
-        delay?: number;
-      }[] = [];
+  //   const getTimestampsA: any[] = rows.map((timestamp: any) => {
+  //     return {
+  //       key: timestamp.key,
+  //       unidad: timestamp.unidad,
+  //       hora_servidor: timestamp.hora_servidor,
+  //       hora_telefono: timestamp.hora_telefono,
+  //       fiscal: timestamp.fiscal,
+  //       ruta: timestamp.ruta,
+  //     };
+  //   });
+  //   let rowsA = getTimestampsA.filter((timestamp: any) => {
+  //     let registros = timestamp.hora_servidor  //ponerle alguna condición 
+  //     return registros;
+  //   });
+  //   rowsA = rowsA.filter((timestamp: any) => timestamp.fiscal === fiscalA);
+  //   const getTimestampsB: any[] = rows.map((timestamp: any) => {
+  //     return {
+  //       key: timestamp.key,
+  //       unidad: timestamp.unidad,
+  //       hora_servidor: timestamp.hora_servidor,
+  //       hora_telefono: timestamp.hora_telefono,
+  //       fiscal: timestamp.fiscal,
+  //       ruta: timestamp.ruta,
+  //     };
+  //   });
+  //   let rowsB = getTimestampsB.filter((timestamp: any) => {
+  //     let registros = timestamp.hora_servidor  //ponerle alguna condición 
+  //     return registros;
+  //   });
+  //   rowsB = rowsB.filter((timestamp: any) => timestamp.fiscal === fiscalB);
+  //   console.log(rowsA, rowsB);
+  //   const compare = (rowsA: any, rowsB: any, timeCompare: any) => {
+  //     let result: {
+  //       onTimeText: string;
+  //       onTime: boolean;
+  //       key: any;
+  //       hora_servidorA: any;
+  //       hora_telefonoA: any;
+  //       fiscalA: any;
+  //       hora_servidorB: any;
+  //       hora_telefonoB: any;
+  //       fiscalB: any;
+  //       diff: number;
+  //       delay?: number;
+  //     }[] = [];
 
-      if(fiscalA === fiscalB){ //Mismo fiscal
-          for (let i = 0; i < rowsA.length-1; i++) {
-            const diff = compareTimeDifference(rowsA[i].hora_servidor, rowsB[i+1].hora_servidor)
-                  result.push({
-                      onTimeText: diff<= timeCompare? "A tiempo" : "Retardado",  
-                      onTime:diff <= timeCompare ? true: false,
-                      key: rowsB[i+1].key,
-                      hora_servidorA: rowsA[i].hora_servidor,
-                      hora_telefonoA: rowsA[i].hora_telefono,
-                      fiscalA: rowsA[i].fiscal,
-                      hora_servidorB: rowsB[i+1].hora_servidor,
-                      hora_telefonoB: rowsB[i+1].hora_telefono,
-                      fiscalB: rowsB[i+1].fiscal,
-                      diff: diff,
-                      delay: diff <= timeCompare ? 0 : diff - timeCompare
-                  });
-          }
-          return result;
-      }else if(rowsA.length > rowsB.length){ //rowsA.length MAYOR rowsB.length
-        for (let i = 0; i < rowsA.length - 1; i++) {
+  //     if(fiscalA === fiscalB){ //Mismo fiscal
+  //         for (let i = 0; i < rowsA.length-1; i++) {
+  //           const diff = compareTimeDifference(rowsA[i].hora_servidor, rowsB[i+1].hora_servidor)
+  //                 result.push({
+  //                     onTimeText: diff<= timeCompare? "A tiempo" : "Retardado",  
+  //                     onTime:diff <= timeCompare ? true: false,
+  //                     key: rowsB[i+1].key,
+  //                     hora_servidorA: rowsA[i].hora_servidor,
+  //                     hora_telefonoA: rowsA[i].hora_telefono,
+  //                     fiscalA: rowsA[i].fiscal,
+  //                     hora_servidorB: rowsB[i+1].hora_servidor,
+  //                     hora_telefonoB: rowsB[i+1].hora_telefono,
+  //                     fiscalB: rowsB[i+1].fiscal,
+  //                     diff: diff,
+  //                     delay: diff <= timeCompare ? 0 : diff - timeCompare
+  //                 });
+  //         }
+  //         return result;
+  //     }else if(rowsA.length > rowsB.length){ //rowsA.length MAYOR rowsB.length
+  //       for (let i = 0; i < rowsA.length - 1; i++) {
           
-          const diff = compareTimeDifference(rowsA[i].hora_servidor, rowsB[i].hora_servidor)
-            result.push({
-              onTimeText: diff <= timeCompare ? "A tiempo" : "Retardado", 
-              onTime: diff <= timeCompare ? true : false,
-              key: rowsB[i].key,
-              hora_servidorA: rowsA[i].hora_servidor,
-              hora_telefonoA: rowsA[i].hora_telefono,
-              fiscalA: rowsA[i].fiscal,
-              hora_servidorB: rowsB[i].hora_servidor,
-              hora_telefonoB: rowsB[i].hora_telefono,
-              fiscalB: rowsB[i].fiscal,
-              diff: diff ,
-              delay: diff <= timeCompare ? 0 : diff - timeCompare
-            });
+  //         const diff = compareTimeDifference(rowsA[i].hora_servidor, rowsB[i].hora_servidor)
+  //           result.push({
+  //             onTimeText: diff <= timeCompare ? "A tiempo" : "Retardado", 
+  //             onTime: diff <= timeCompare ? true : false,
+  //             key: rowsB[i].key,
+  //             hora_servidorA: rowsA[i].hora_servidor,
+  //             hora_telefonoA: rowsA[i].hora_telefono,
+  //             fiscalA: rowsA[i].fiscal,
+  //             hora_servidorB: rowsB[i].hora_servidor,
+  //             hora_telefonoB: rowsB[i].hora_telefono,
+  //             fiscalB: rowsB[i].fiscal,
+  //             diff: diff ,
+  //             delay: diff <= timeCompare ? 0 : diff - timeCompare
+  //           });
 
-        }
-        return result;
-      }else if(rowsA.length < rowsB.length){ //rowsA.length MENOR rowsB.length
-         for (let i = 0; i < rowsA.length; i++) {
-           const diff = compareTimeDifference(rowsA[i].hora_servidor, rowsB[i+1].hora_servidor)
-            result.push({
-              onTimeText: diff <= timeCompare ? "A tiempo" : "Retardado", 
-              onTime: diff <= timeCompare ? true : false,
-              key: rowsB[i +1].key,
-              hora_servidorA: rowsA[i].hora_servidor,
-              hora_telefonoA: rowsA[i].hora_telefono,
-              fiscalA: rowsA[i].fiscal,
-              hora_servidorB: rowsB[i +1].hora_servidor,
-              hora_telefonoB: rowsB[i +1].hora_telefono,
-              fiscalB: rowsB[i +1].fiscal,
-              diff: diff,
-              delay: diff <= timeCompare ? 0 : diff - timeCompare
-            });
-        }
-        return result;
-      }else{ //rowsA.length IGUAL rowsB.length
-          for (let i = 0; i < rowsA.length; i++) {
-            const diff = compareTimeDifference(rowsA[i].hora_servidor, rowsB[i].hora_servidor)
-            console.log(diff)
-          result.push({
-            onTimeText: diff <= timeCompare ? "A tiempo" : "Retardado", 
-            onTime: diff <= timeCompare ? true : false,
-            key: rowsB[i].key,
-            hora_servidorA: rowsA[i].hora_servidor,
-            hora_telefonoA: rowsA[i].hora_telefono,
-            fiscalA: rowsA[i].fiscal,
-            hora_servidorB: rowsB[i].hora_servidor,
-            hora_telefonoB: rowsB[i].hora_telefono,
-            fiscalB: rowsB[i].fiscal,
-            diff: diff ,
-            delay: diff <= timeCompare ? 0 : diff - timeCompare
-          });
-      }
-      return result;
-        }
-    };
-    const comparedTimes = compare(rowsA, rowsB, timeCompare);
-      rows = rows.map((row: any) => {
-        const comparedTime = comparedTimes.find((ct: any) => ct.key === row.key);
-        if (comparedTime) {
-          console.log(  
-            comparedTime
-          )
-          return {
-            ...row,
-            onTime: comparedTime.onTime,
-            diff: comparedTime.diff,
-            delay: comparedTime.delay,
-            onTimeText: comparedTime.onTimeText
-          };
-        }
-        return row;
-      });
-  } 
+  //       }
+  //       return result;
+  //     }else if(rowsA.length < rowsB.length){ //rowsA.length MENOR rowsB.length
+  //        for (let i = 0; i < rowsA.length; i++) {
+  //          const diff = compareTimeDifference(rowsA[i].hora_servidor, rowsB[i+1].hora_servidor)
+  //           result.push({
+  //             onTimeText: diff <= timeCompare ? "A tiempo" : "Retardado", 
+  //             onTime: diff <= timeCompare ? true : false,
+  //             key: rowsB[i +1].key,
+  //             hora_servidorA: rowsA[i].hora_servidor,
+  //             hora_telefonoA: rowsA[i].hora_telefono,
+  //             fiscalA: rowsA[i].fiscal,
+  //             hora_servidorB: rowsB[i +1].hora_servidor,
+  //             hora_telefonoB: rowsB[i +1].hora_telefono,
+  //             fiscalB: rowsB[i +1].fiscal,
+  //             diff: diff,
+  //             delay: diff <= timeCompare ? 0 : diff - timeCompare
+  //           });
+  //       }
+  //       return result;
+  //     }else{ //rowsA.length IGUAL rowsB.length
+  //         for (let i = 0; i < rowsA.length; i++) {
+  //           const diff = compareTimeDifference(rowsA[i].hora_servidor, rowsB[i].hora_servidor)
+  //           console.log(diff)
+  //         result.push({
+  //           onTimeText: diff <= timeCompare ? "A tiempo" : "Retardado", 
+  //           onTime: diff <= timeCompare ? true : false,
+  //           key: rowsB[i].key,
+  //           hora_servidorA: rowsA[i].hora_servidor,
+  //           hora_telefonoA: rowsA[i].hora_telefono,
+  //           fiscalA: rowsA[i].fiscal,
+  //           hora_servidorB: rowsB[i].hora_servidor,
+  //           hora_telefonoB: rowsB[i].hora_telefono,
+  //           fiscalB: rowsB[i].fiscal,
+  //           diff: diff ,
+  //           delay: diff <= timeCompare ? 0 : diff - timeCompare
+  //         });
+  //     }
+  //     return result;
+  //       }
+  //   };
+  //   const comparedTimes = compare(rowsA, rowsB, timeCompare);
+  //     rows = rows.map((row: any) => {
+  //       const comparedTime = comparedTimes.find((ct: any) => ct.key === row.key);
+  //       if (comparedTime) {
+  //         console.log(  
+  //           comparedTime
+  //         )
+  //         return {
+  //           ...row,
+  //           onTime: comparedTime.onTime,
+  //           diff: comparedTime.diff,
+  //           delay: comparedTime.delay,
+  //           onTimeText: comparedTime.onTimeText
+  //         };
+  //       }
+  //       return row;
+  //     });
+  // } 
+   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const hiddenTableRef = useRef<HTMLDivElement | null>(null);
+
+  const handleDownloadImage = async (index: number, title: string) => {
+    const ref = cardRefs.current[index];
+    if (ref) {
+      // Clonar el contenido de la tabla en un elemento oculto
+      const clone = ref.cloneNode(true) as HTMLDivElement;
+      clone.style.position = 'absolute';
+      clone.style.top = '-9999px';
+      clone.style.left = '-9999px';
+      clone.style.width = 'auto';
+      clone.style.height = 'auto';
+      document.body.appendChild(clone);
+
+      // Capturar la imagen del elemento clonado
+      const canvas = await html2canvas(clone);
+      const dataUrl = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.href = dataUrl;
+      link.download = `${title} ${todayDate.fecha}.png`;
+      link.click();
+
+      // Eliminar el elemento clonado
+      document.body.removeChild(clone);
+    }
+  };
+
+  useEffect(() => {
+    cardRefs.current = cardRefs.current.slice(0, registrosOrdenados.length);
+  }, [registrosOrdenados]);
+
+
   return (
     <div>
      <section className="flex flex-col items-center justify-center gap-4">
@@ -777,10 +824,16 @@ export default function Index({
      </section>
      {showOrden && <section className='flex flex-col items-center justify-center gap-4'>
         <h1 className="text-xl font-bold mt-4">Registros ordenados</h1>
-        <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4 justify-center items-center">
-          {registrosOrdenados && registrosOrdenados.map((registro: any) => (
-              <Card className='' key={registro.title}>
+        <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4 ">
+          {registrosOrdenados && registrosOrdenados.map((registro: any, index: number) => (
+            <Card className='relative' key={registro.title} ref={el => { cardRefs.current[index] = el; }}>
                   <CardHeader>
+              <Button
+                onClick={() => handleDownloadImage(index, registro.title)}
+                className="absolute top-2 right-2 bg-blue-500 text-white p-1 rounded"
+              >
+                Descargar
+              </Button>
                     <h1 className="font-bold text-lg">{registro.title}</h1>
                   </CardHeader>
                   <Divider/>
@@ -791,7 +844,7 @@ export default function Index({
                           <TableColumn key={column.key}>{column.label}</TableColumn>
                         )}
                       </TableHeader>
-                  <TableBody items={registro.group} aria-label="Tabla">
+                  <TableBody items={registro.group} aria-label="Tabla" >
                         {(item) => (
                           <TableRow key={(item as any).key} className={classNames('rounded', {
                             "bg-red-700": (item as any).onTime === false,

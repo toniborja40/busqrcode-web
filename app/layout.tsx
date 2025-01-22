@@ -65,14 +65,14 @@ export default async function RootLayout({
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
           <div className="relative flex flex-col w-full ">
             {verification ?<> <Navbar_header verification={rol}/>
-            <div className="flex justify-center items-center">
+            <div className="flex ">
              {/* <SideBar /> */}
-              <main className="container relative pt-8 px-6">
+              <main className=" pt-8 px-6">
                 {children}
               </main>
               </div></>
                : 
-              <main className=" flex-grow relative pt-8 px-6">
+              <main className=" pt-8 px-6">
               {children}
             </main>} 
             {/* <footer className="w-full flex items-center justify-center py-3">
