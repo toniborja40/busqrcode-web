@@ -501,189 +501,70 @@ export default function Index({
     // Llamar a la función de comparación
     const registrosOrdenados = compareTimestamps(setTimestamps);
     console.log(registrosOrdenados);
-    
-      //algoritmo que le agregue a registrosOrdenados si están a tiempo o no y la diferencia de tiempo
 
-  //   if (fiscalAExists && fiscalBExists && timeCompare) {
-     
-  //    //hora_servidor es la hora a la que pasó el autobús frente al fiscal, o en su defecto la hora de salida que indicó el fiscal del terminal o de barrancas
 
-  //   const getTimestampsA: any[] = rows.map((timestamp: any) => {
-  //     return {
-  //       key: timestamp.key,
-  //       unidad: timestamp.unidad,
-  //       hora_servidor: timestamp.hora_servidor,
-  //       hora_telefono: timestamp.hora_telefono,
-  //       fiscal: timestamp.fiscal,
-  //       ruta: timestamp.ruta,
-  //     };
-  //   });
-  //   let rowsA = getTimestampsA.filter((timestamp: any) => {
-  //     let registros = timestamp.hora_servidor  //ponerle alguna condición 
-  //     return registros;
-  //   });
-  //   rowsA = rowsA.filter((timestamp: any) => timestamp.fiscal === fiscalA);
-  //   const getTimestampsB: any[] = rows.map((timestamp: any) => {
-  //     return {
-  //       key: timestamp.key,
-  //       unidad: timestamp.unidad,
-  //       hora_servidor: timestamp.hora_servidor,
-  //       hora_telefono: timestamp.hora_telefono,
-  //       fiscal: timestamp.fiscal,
-  //       ruta: timestamp.ruta,
-  //     };
-  //   });
-  //   let rowsB = getTimestampsB.filter((timestamp: any) => {
-  //     let registros = timestamp.hora_servidor  //ponerle alguna condición 
-  //     return registros;
-  //   });
-  //   rowsB = rowsB.filter((timestamp: any) => timestamp.fiscal === fiscalB);
-  //   console.log(rowsA, rowsB);
-  //   const compare = (rowsA: any, rowsB: any, timeCompare: any) => {
-  //     let result: {
-  //       onTimeText: string;
-  //       onTime: boolean;
-  //       key: any;
-  //       hora_servidorA: any;
-  //       hora_telefonoA: any;
-  //       fiscalA: any;
-  //       hora_servidorB: any;
-  //       hora_telefonoB: any;
-  //       fiscalB: any;
-  //       diff: number;
-  //       delay?: number;
-  //     }[] = [];
+    //descargar imagenes
 
-  //     if(fiscalA === fiscalB){ //Mismo fiscal
-  //         for (let i = 0; i < rowsA.length-1; i++) {
-  //           const diff = compareTimeDifference(rowsA[i].hora_servidor, rowsB[i+1].hora_servidor)
-  //                 result.push({
-  //                     onTimeText: diff<= timeCompare? "A tiempo" : "Retardado",  
-  //                     onTime:diff <= timeCompare ? true: false,
-  //                     key: rowsB[i+1].key,
-  //                     hora_servidorA: rowsA[i].hora_servidor,
-  //                     hora_telefonoA: rowsA[i].hora_telefono,
-  //                     fiscalA: rowsA[i].fiscal,
-  //                     hora_servidorB: rowsB[i+1].hora_servidor,
-  //                     hora_telefonoB: rowsB[i+1].hora_telefono,
-  //                     fiscalB: rowsB[i+1].fiscal,
-  //                     diff: diff,
-  //                     delay: diff <= timeCompare ? 0 : diff - timeCompare
-  //                 });
-  //         }
-  //         return result;
-  //     }else if(rowsA.length > rowsB.length){ //rowsA.length MAYOR rowsB.length
-  //       for (let i = 0; i < rowsA.length - 1; i++) {
-          
-  //         const diff = compareTimeDifference(rowsA[i].hora_servidor, rowsB[i].hora_servidor)
-  //           result.push({
-  //             onTimeText: diff <= timeCompare ? "A tiempo" : "Retardado", 
-  //             onTime: diff <= timeCompare ? true : false,
-  //             key: rowsB[i].key,
-  //             hora_servidorA: rowsA[i].hora_servidor,
-  //             hora_telefonoA: rowsA[i].hora_telefono,
-  //             fiscalA: rowsA[i].fiscal,
-  //             hora_servidorB: rowsB[i].hora_servidor,
-  //             hora_telefonoB: rowsB[i].hora_telefono,
-  //             fiscalB: rowsB[i].fiscal,
-  //             diff: diff ,
-  //             delay: diff <= timeCompare ? 0 : diff - timeCompare
-  //           });
-
-  //       }
-  //       return result;
-  //     }else if(rowsA.length < rowsB.length){ //rowsA.length MENOR rowsB.length
-  //        for (let i = 0; i < rowsA.length; i++) {
-  //          const diff = compareTimeDifference(rowsA[i].hora_servidor, rowsB[i+1].hora_servidor)
-  //           result.push({
-  //             onTimeText: diff <= timeCompare ? "A tiempo" : "Retardado", 
-  //             onTime: diff <= timeCompare ? true : false,
-  //             key: rowsB[i +1].key,
-  //             hora_servidorA: rowsA[i].hora_servidor,
-  //             hora_telefonoA: rowsA[i].hora_telefono,
-  //             fiscalA: rowsA[i].fiscal,
-  //             hora_servidorB: rowsB[i +1].hora_servidor,
-  //             hora_telefonoB: rowsB[i +1].hora_telefono,
-  //             fiscalB: rowsB[i +1].fiscal,
-  //             diff: diff,
-  //             delay: diff <= timeCompare ? 0 : diff - timeCompare
-  //           });
-  //       }
-  //       return result;
-  //     }else{ //rowsA.length IGUAL rowsB.length
-  //         for (let i = 0; i < rowsA.length; i++) {
-  //           const diff = compareTimeDifference(rowsA[i].hora_servidor, rowsB[i].hora_servidor)
-  //           console.log(diff)
-  //         result.push({
-  //           onTimeText: diff <= timeCompare ? "A tiempo" : "Retardado", 
-  //           onTime: diff <= timeCompare ? true : false,
-  //           key: rowsB[i].key,
-  //           hora_servidorA: rowsA[i].hora_servidor,
-  //           hora_telefonoA: rowsA[i].hora_telefono,
-  //           fiscalA: rowsA[i].fiscal,
-  //           hora_servidorB: rowsB[i].hora_servidor,
-  //           hora_telefonoB: rowsB[i].hora_telefono,
-  //           fiscalB: rowsB[i].fiscal,
-  //           diff: diff ,
-  //           delay: diff <= timeCompare ? 0 : diff - timeCompare
-  //         });
-  //     }
-  //     return result;
-  //       }
-  //   };
-  //   const comparedTimes = compare(rowsA, rowsB, timeCompare);
-  //     rows = rows.map((row: any) => {
-  //       const comparedTime = comparedTimes.find((ct: any) => ct.key === row.key);
-  //       if (comparedTime) {
-  //         console.log(  
-  //           comparedTime
-  //         )
-  //         return {
-  //           ...row,
-  //           onTime: comparedTime.onTime,
-  //           diff: comparedTime.diff,
-  //           delay: comparedTime.delay,
-  //           onTimeText: comparedTime.onTimeText
-  //         };
-  //       }
-  //       return row;
-  //     });
-  // } 
-   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const hiddenTableRef = useRef<HTMLDivElement | null>(null);
+    // ----!!!!! IMPORTANTE !!!!!-----
+    // falta por optimizar, tal vez recogiendo los datos individualmente y creando el componente de nuevo en vez de clona
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const hiddenContainerRef = useRef<HTMLDivElement | null>(null);
 
   const handleDownloadImage = async (index: number, title: string) => {
     const ref = cardRefs.current[index];
-    if (ref) {
-      // Clonar el contenido de la tabla en un elemento oculto
-      const clone = ref.cloneNode(true) as HTMLDivElement;
-      clone.style.position = 'absolute';
-      clone.style.top = '-9999px';
-      clone.style.left = '-9999px';
-      clone.style.width = 'auto';
-      clone.style.height = 'auto';
-      document.body.appendChild(clone);
+    if (ref && hiddenContainerRef.current) {
+      // Limpiar el contenedor oculto
+      hiddenContainerRef.current.innerHTML = '';
 
-      // Capturar la imagen del elemento clonado
-      const canvas = await html2canvas(clone);
-      const dataUrl = canvas.toDataURL('image/png');
-      const link = document.createElement('a');
-      link.href = dataUrl;
-      link.download = `${title} ${todayDate.fecha}.png`;
-      link.click();
+      // Crear un nuevo elemento HTML que contenga solo los datos de la tabla
+      const tableClone = document.createElement('div');
+      tableClone.innerHTML = ref.querySelector('table')?.outerHTML || '';
 
-      // Eliminar el elemento clonado
-      document.body.removeChild(clone);
+      // Aplicar estilos mínimos para asegurar que la tabla se renderice completamente
+      tableClone.style.position = 'absolute';
+      tableClone.style.top = '0';
+      tableClone.style.left = '0';
+      tableClone.style.width = 'auto';
+      tableClone.style.height = 'auto';
+      tableClone.style.overflow = 'visible';
+
+      // Añadir el clon al contenedor oculto
+      hiddenContainerRef.current.appendChild(tableClone);
+
+      // Usar requestAnimationFrame para mejorar el rendimiento
+      requestAnimationFrame(async () => {
+        const canvas = await html2canvas(tableClone, { useCORS: true });
+        const dataUrl = canvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.href = dataUrl;
+        link.download = `${title} ${todayDate.fecha}.png`;
+        link.click();
+
+        // Limpiar el contenedor oculto
+        if (hiddenContainerRef.current) {
+          hiddenContainerRef.current.innerHTML = '';
+        }
+      });
     }
   };
+  // recolectar los datos del servidor y hacer de nuevo otro componente en vez de clonar  ----> opción para desarrollar después
+
+
+
+
+
+
+
+
+
 
   useEffect(() => {
     cardRefs.current = cardRefs.current.slice(0, registrosOrdenados.length);
   }, [registrosOrdenados]);
 
-
   return (
     <div>
+      <div ref={hiddenContainerRef} style={{ position: 'absolute', top: '-9999px', left: '-9999px', width: 'auto', height: 'auto', overflow: 'hidden' }}></div>
      <section className="flex flex-col items-center justify-center gap-4">
         <div className="inline-block max-w-xl text-center justify-center">
           <h1 className="text-2xl font-bold">Horarios Fiscales</h1>
