@@ -20,6 +20,7 @@ import html2canvas from 'html2canvas';
 import { toast } from "react-toastify";
 import axios from "axios";
 import {ScrollUpIcon}  from "../icons";
+import jsPDF from 'jspdf';
 interface IndexProps {
   horarios?: any;
   rutas?: any;
@@ -236,7 +237,7 @@ export default function Index({
     },
     {
       key: "onTimeText",
-      label: "On Time",
+      label: "¿A tiempo?",
     },
     {
       key: "diff",
@@ -520,8 +521,6 @@ export default function Index({
 
     //descargar imagenes
 
-    // ----!!!!! IMPORTANTE !!!!!-----
-    // falta por optimizar, tal vez recogiendo los datos individualmente y creando el componente de nuevo en vez de clona
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const hiddenContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -531,9 +530,12 @@ export default function Index({
       // Limpiar el contenedor oculto
       hiddenContainerRef.current.innerHTML = '';
 
-      // Crear un nuevo elemento HTML que contenga solo los datos de la tabla
+      // Extraer los datos de la tabla
+      const tableData = ref.querySelector('table')?.outerHTML || '';
+
+      // Crear un nuevo componente que contenga los datos
       const tableClone = document.createElement('div');
-      tableClone.innerHTML = ref.querySelector('table')?.outerHTML || '';
+      tableClone.innerHTML = tableData;
 
       // Aplicar estilos mínimos para asegurar que la tabla se renderice completamente
       tableClone.style.position = 'absolute';
@@ -544,7 +546,10 @@ export default function Index({
       tableClone.style.overflow = 'visible';
 
       // Añadir el clon al contenedor oculto
-      hiddenContainerRef.current.appendChild(tableClone);
+        if (hiddenContainerRef.current) {
+          hiddenContainerRef.current.appendChild(tableClone);
+        }
+      
 
       // Usar requestAnimationFrame para mejorar el rendimiento
       requestAnimationFrame(async () => {
@@ -552,7 +557,7 @@ export default function Index({
         const dataUrl = canvas.toDataURL('image/png');
         const link = document.createElement('a');
         link.href = dataUrl;
-        link.download = `${title} ${fecha}.png`;
+        link.download = `${title} ${todayDate.fecha}.png`;
         link.click();
 
         // Limpiar el contenedor oculto
@@ -565,11 +570,71 @@ export default function Index({
   // recolectar los datos del servidor y hacer de nuevo otro componente en vez de clonar  ----> opción para desarrollar después
 
 
+  // Función para filtrar los grupos que tienen al menos una propiedad onTime igual a false
+   const getLateGroupsRefs = () => {
+    const filteredData = registrosOrdenados.reduce((acc: any[], registro: any) => {
+      const hasLateItem = registro.group.some((item: any) => item.onTime === false);
+      if (hasLateItem) {
+        acc.push(registro.group);
+      }
+      return acc;
+    }, []);
 
+    // Mostrar los datos por consola
+    console.log(filteredData);
 
+    return filteredData;
+  };
 
+  // // Función para generar el PDF
+  // const generatePDF = async () => {
+  //   const filteredData = getLateGroupsRefs();
+  //   const pdf = new jsPDF();
+  //   let yOffset = 10;
 
+  //   for (const { title, group } of filteredData) {
+  //     // Crear un clon de la estructura de la tabla sin los datos
+  //     const tableClone = document.createElement('div');
+  //     tableClone.innerHTML = `
+  //       <table>
+  //         <thead>
+  //           <tr>
+  //             ${columns1.map(column => `<th>${column.label}</th>`).join('')}
+  //           </tr>
+  //         </thead>
+  //         <tbody>
+  //           ${group.map((item: { [x: string]: any; }) => `
+  //             <tr>
+  //               ${columns1.map(column => `<td>${item[column.key]}</td>`).join('')}
+  //             </tr>
+  //           `).join('')}
+  //         </tbody>
+  //       </table>
+  //     `;
 
+  //     // Añadir el clon al contenedor oculto
+  //     if (hiddenContainerRef.current) {
+  //       hiddenContainerRef.current.appendChild(tableClone);
+  //     }
+
+  //     // Usar html2canvas para capturar la imagen del clon
+  //     const canvas = await html2canvas(tableClone, { useCORS: true });
+  //     const imgData = canvas.toDataURL('image/png');
+  //     pdf.addImage(imgData, 'PNG', 10, yOffset, 180, 60);
+  //     yOffset += 72; // Separación de 12 píxeles entre cada registro
+
+  //     // Limpiar el contenedor oculto
+  //     if (hiddenContainerRef.current) {
+  //       hiddenContainerRef.current.innerHTML = '';
+  //     }
+
+  //     // Añadir título
+  //     pdf.text(`Unidad ${title}`, 10, yOffset - 62);
+  //   }
+
+  //   // Guardar el PDF con el nombre de la fecha de hoy + 'buses retardados'
+  //   pdf.save(`${new Date().toLocaleDateString()} buses retardados.pdf`);
+  // };
 
 
 
@@ -712,7 +777,9 @@ export default function Index({
                 <Button onClick={() => setShowOrden(!showOrden)} className="bg-sky-600 font-bold">
                   {showOrden ? "Ocultar Registros Ordenados" : "Mostrar Registros Ordenados"}
                 </Button>
-
+                {/* <Button onClick={generatePDF} className="bg-sky-600 font-bold">
+                 Imprimir Retardados
+                </Button> */}
               </div>
             </CardBody>
           </Card>
