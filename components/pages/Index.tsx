@@ -512,7 +512,7 @@ export default function Index({
 
 
 
-
+//FALTA OPTIMIZAR <-----------!!!!!!
 
     // Llamar a la función de comparación
     const registrosOrdenados = compareTimestamps(setTimestamps);
