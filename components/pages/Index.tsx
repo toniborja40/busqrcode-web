@@ -128,6 +128,21 @@ export default function Index({
     const strHours = String(hours).padStart(2, "0");
     return `${strHours}:${minutes} ${ampm}`;
   };
+  const formatHour30secs = (dateString: string) => {
+    const date = new Date(dateString);
+    date.setSeconds(date.getSeconds() - 30); // Adelantar 30 segundos jasjsjjadas
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    let hours = date.getHours();
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const secs = String(date.getSeconds()).padStart(2, "0");
+    const ampm = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+    const strHours = String(hours).padStart(2, "0");
+    return `${strHours}:${minutes} ${ampm}`;
+  };
   const compareTimeDifference = (time1: string, time2: string): number => {
     // Función para convertir hora en formato hh:mm AM/PM a objeto Date
     const convertTo24HourFormat = (time: string): Date => {
@@ -170,8 +185,8 @@ export default function Index({
        return {
          key: timestamp._id,
          hora_date: formatDate(timestamp.createdAt),
-         hora_servidor: formatHour(timestamp.createdAt),
-         hora_telefono: formatHour(timestamp.timestamp_telefono),
+         hora_servidor: formatHour30secs(timestamp.createdAt),
+         hora_telefono: formatHour30secs(timestamp.timestamp_telefono),
          unidad: unidad[0].numero,
          ruta: ruta[0].nombre,
          fiscal: fiscal[0].ubicacion,
