@@ -627,6 +627,12 @@ export default function Index({
         link.download = `${title} ${fecha}.png`;
         link.click();
 
+        // // Crear un nuevo PDF
+        // const pdf = new jsPDF();
+        // pdf.addImage(dataUrl, 'PNG', 10, 10, 180, 160); // Ajusta las dimensiones según sea necesario
+        // pdf.save(`${title} ${new Date().toLocaleDateString()}.pdf`);
+
+
         // Limpiar el contenedor oculto
         if (hiddenContainerRef.current) {
           hiddenContainerRef.current.innerHTML = '';
