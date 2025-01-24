@@ -17,6 +17,7 @@ import {
 import classNames from "classnames";
 import { useEffect, useState, useRef } from "react";
 import html2canvas from 'html2canvas';
+import ReactDOMServer from 'react-dom/server';
 import { toast } from "react-toastify";
 import axios from "axios";
 import {ScrollUpIcon}  from "../icons";
@@ -40,6 +41,59 @@ const getTodayDate = () => {
 
 // Uso de la función
 const todayDate = getTodayDate();
+
+
+
+//componente card
+
+interface CustomCardProps {
+  columns1: { key: string, label: string }[];
+  titulo: string;
+  group: any[];
+  onDownload: () => void;
+}
+
+const CustomCard: React.FC<CustomCardProps> = ({ columns1, titulo, group, onDownload }) => {
+  return (
+    <Card className='relative'>
+      <CardHeader>
+        <h1 className="font-bold text-lg">{titulo}</h1>
+      </CardHeader>
+      <Divider />
+      <CardBody className='h-72'>
+        <Table>
+          <TableHeader columns={columns1} aria-label="Tabla">
+            {(column) => (
+              <TableColumn key={column.key}>{column.label}</TableColumn>
+            )}
+          </TableHeader>
+          <TableBody items={group} aria-label="Tabla">
+            {(item) => (
+              <TableRow key={(item as any).key} className={classNames('rounded', {
+                "bg-red-700": (item as any).onTime === false,
+              })}
+                aria-label="Tabla">
+                {(columnKey) => (
+                  <TableCell>
+                    {/* <Link href={`/registros/${item.key}`}> */}
+                    {getKeyValue(item, columnKey)}
+                    {/* </Link> */}
+                  </TableCell>
+                )}
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </CardBody>
+    </Card>
+  );
+};
+
+
+
+
+
+
 export default function Index({
   horarios,
   rutas, 
@@ -511,53 +565,66 @@ export default function Index({
 
 
 
-
-//FALTA OPTIMIZAR <-----------!!!!!!
-// requerir los datos de registros ordenados e insertarlos en un nuevo contenedor
     // Llamar a la función de comparación
     const registrosOrdenados = compareTimestamps(setTimestamps);
     console.log(registrosOrdenados);
+    
+    //FALTA OPTIMIZAR <-----------!!!!!!
+    // requerir los datos de registros ordenados e insertarlos en un nuevo contenedor
 
 
     //descargar imagenes
-
+  const [selectedRegistro, setSelectedRegistro] = useState<any[]>()
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const hiddenContainerRef = useRef<HTMLDivElement | null>(null);
+
 
   const handleDownloadImage = async (index: number, title: string) => {
     const ref = cardRefs.current[index];
     if (ref && hiddenContainerRef.current) {
       // Limpiar el contenedor oculto
       hiddenContainerRef.current.innerHTML = '';
-
+      if (index >= 0 && index < registrosOrdenados.length) {
+        setSelectedRegistro(registrosOrdenados[index]);
+      }
       // Extraer los datos de la tabla
-      const tableData = ref.querySelector('table')?.outerHTML || '';
-
+      const tableData = ref.outerHTML || '';
+      console.log(registrosOrdenados[index])
       // Crear un nuevo componente que contenga los datos
-      const tableClone = document.createElement('div');
-      tableClone.innerHTML = tableData;
+
+      const cardHtml = ReactDOMServer.renderToString(
+        <CustomCard
+          columns1={columns1}
+          titulo={registrosOrdenados[index].title}
+          group={registrosOrdenados[index].group}
+          onDownload={() => handleDownloadImage(index, registrosOrdenados[index].title)}
+        />
+      );
+
+
+      const cardClone = document.createElement('div');
+      cardClone.innerHTML = cardHtml;;
 
       // Aplicar estilos mínimos para asegurar que la tabla se renderice completamente
-      tableClone.style.position = 'absolute';
-      tableClone.style.top = '0';
-      tableClone.style.left = '0';
-      tableClone.style.width = 'auto';
-      tableClone.style.height = 'auto';
-      tableClone.style.overflow = 'visible';
-
+      cardClone.style.position = 'absolute';
+      cardClone.style.top = '0';
+      cardClone.style.left = '0';
+      cardClone.style.width = 'auto';
+      cardClone.style.height = 'auto';
+      cardClone.style.overflow = 'visible';
       // Añadir el clon al contenedor oculto
         if (hiddenContainerRef.current) {
-          hiddenContainerRef.current.appendChild(tableClone);
+          hiddenContainerRef.current.appendChild(cardClone)
         }
       
 
       // Usar requestAnimationFrame para mejorar el rendimiento
       requestAnimationFrame(async () => {
-        const canvas = await html2canvas(tableClone, { useCORS: true });
+        const canvas = await html2canvas(cardClone, { useCORS: true });
         const dataUrl = canvas.toDataURL('image/png');
         const link = document.createElement('a');
         link.href = dataUrl;
-        link.download = `${title} ${todayDate.fecha}.png`;
+        link.download = `${title} ${fecha}.png`;
         link.click();
 
         // Limpiar el contenedor oculto
@@ -801,7 +868,7 @@ export default function Index({
                   </CardHeader>
                   <Divider/>
                   <CardBody className='h-72'>
-                    <Table>
+                <Table aria-label={`Tabla de ${registro.title}`}>
                   <TableHeader columns={columns1} aria-label="Tabla">
                         {(column) => (
                           <TableColumn key={column.key}>{column.label}</TableColumn>
@@ -864,89 +931,6 @@ export default function Index({
               </TableBody>
             </Table>
           </div>
-          {/* ruta && (
-            <div>
-              <div>
-                <Card>
-                  <div className="flex flex-col m-4 items-center justify-center">
-                    <h1 className="font-bold text-lg">Comparación</h1>
-                    <Divider />
-                  </div>
-                  <CardBody className="p-5 flex flex-wrap flex-row gap-6 justify-center items-center">
-                  
-                    <div>
-                      <label
-                        htmlFor="fiscalA"
-                        className="block text-sm font-medium dark:text-slate-100 text-gray-700"
-                      >
-                        Fiscal A
-                      </label>
-                      <select //hacer un SELECT
-                        id="fiscalA"
-                        value={fiscalA ? fiscalA : ""}
-                        onChange={(e) => {
-                          setFiscalA(e.target.value);
-                        }}
-                        className="mt-1 block w-full pl-3 pr-8 py-2 text-base border border-black focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                      >
-                        <option value="" disabled>
-                          Elige un fiscal
-                        </option>
-                        {fiscales_.map((unidad: any) => (
-                          <option key={unidad._id} value={unidad.ubicacion}>
-                            {unidad.ubicacion}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label
-                        htmlFor="fiscalB"
-                        className="block text-sm font-medium dark:text-slate-100 text-gray-700"
-                      >
-                        Fiscal B
-                      </label>
-                      <select //hacer un SELECT
-                        id="fiscalB"
-                        value={fiscalB ? fiscalB : ""}
-                        onChange={(e) => {
-                          setFiscalB(e.target.value);
-                        }}
-                        className="mt-1 block w-full pl-3 pr-8 py-2 text-base border border-black focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                      >
-                        <option value="" disabled>
-                          Elige un fiscal
-                        </option>
-                        {fiscales_.map((unidad: any) => (
-                          <option key={unidad._id} value={unidad.ubicacion}>
-                            {unidad.ubicacion}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label
-                        htmlFor="number"
-                        className="block text-sm font-medium dark:text-slate-100 text-gray-700"
-                      >
-                        Tiempo de comparación (minutos)
-                      </label>
-                      <input
-                        id="number"
-                        type="number"
-                        value={timeCompare ? timeCompare : ""}
-                        onChange={(e) => {
-                          settimeCompare(e.target.value);
-                        }}
-                        className=" mt-1 block w-full pl-2 pr-2 py-2 text-base border border-black focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                      />
-                    </div>
-                  </CardBody>
-                </Card>
-              </div>
-            </div>
-          ) */}
           {/* mostrar registros ordenados */}
      
         </div>
