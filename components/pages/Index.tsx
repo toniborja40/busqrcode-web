@@ -512,7 +512,7 @@ export default function Index({
               group[i + 2].delay = diff > 45 ? diff - 45 : 0;
             }
             if (group[i].fiscal == 'Barrancas' && group[i + 1]?.fiscal == 'Panaderia') {
-              const time1 = convertToMinutes(group[i].hora_telefono);
+              const time1 = convertToMinutes(group[i].hora_servidor);
               const time2 = convertToMinutes(group[i + 1].hora_telefono);
               const diff = time2 - time1;
               const isBefore8am = time1 < 8 * 60; // 8am in minutes
