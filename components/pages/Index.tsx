@@ -15,7 +15,7 @@ import {
   CardHeader,
 } from "@nextui-org/react";
 import classNames from "classnames";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import html2canvas from 'html2canvas';
 import ReactDOMServer from 'react-dom/server';
 import { toast } from "react-toastify";
@@ -121,39 +121,43 @@ export default function Index({
   const [showOrden, setShowOrden] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isAtTop, setIsAtTop] = useState(true);
+
+
   useEffect(() => {
     const handleScroll = () => {
       setIsAtTop(window.scrollY === 0);
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
-
-  const scrollUp = () => {
+  const scrollUp = useCallback(() => {
     window.scrollTo({
       top: 0,
-      behavior: 'smooth'
+      behavior: "smooth",
     });
-  }
-  const fetchData = async () => {
+  }, []);
+
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       const response = await axios.post("/api/timestamps", { fecha: fecha });
       setTimestamps_(response.data);
     } catch (error) {
-      console.log('error', fecha);
+      console.log("error", fecha);
       console.log(error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [fecha]);
+
   useEffect(() => {
     fetchData();
-  }, [fecha]);
+  }, [fecha, fetchData]);
+
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -455,40 +459,40 @@ export default function Index({
 
 
     // Función para comparar registros
-    const compareTimestamps = (timestamps: any[]) => {
-      const grouped = timestamps.reduce((acc: any, timestamp: any) => {
-        const key = `${timestamp.unidad}-${timestamp.ruta}`;
-        if (!acc[key]) {
-          acc[key] = [];
-        }
-        acc[key].push(timestamp);
-        return acc;
-      }, {});
+  const compareTimestamps = useCallback((timestamps: any[]) => {
+    const grouped = timestamps.reduce((acc: any, timestamp: any) => {
+      const key = `${timestamp.unidad}-${timestamp.ruta}`;
+      if (!acc[key]) {
+        acc[key] = [];
+      }
+      acc[key].push(timestamp);
+      return acc;
+    }, {});
 
-      // Ordenar las claves de los grupos por el número de unidad
-      const sortedKeys = Object.keys(grouped).sort((a, b) => {
-        const unitA = parseInt(a.split('-')[0], 10);
-        const unitB = parseInt(b.split('-')[0], 10);
-        return unitA - unitB;
-      });
-      let sortedRegistros: any[] = []
-      sortedKeys.forEach((key) => {
-        const group = grouped[key];
-        const fiscales = new Set(group.map((timestamp: any) => timestamp.fiscal));
-        if (fiscales.size > 1) {
-          // Convertir hora_servidor a minutos
-          const convertToMinutes = (timeString: string) => {
-            const [time, modifier] = timeString.split(' ');
-            let [hours, minutes] = time.split(':').map(Number);
-            if (modifier === 'PM' && hours !== 12) {
-              hours += 12;
-            }
-            if (modifier === 'AM' && hours === 12) {
-              hours = 0;
-            }
-            return hours * 60 + minutes;
-          };
+    // Ordenar las claves de los grupos por el número de unidad
+    const sortedKeys = Object.keys(grouped).sort((a, b) => {
+      const unitA = parseInt(a.split('-')[0], 10);
+      const unitB = parseInt(b.split('-')[0], 10);
+      return unitA - unitB;
+    });
 
+    let sortedRegistros: any[] = [];
+    sortedKeys.forEach((key) => {
+      const group = grouped[key];
+      const fiscales = new Set(group.map((timestamp: any) => timestamp.fiscal));
+      if (fiscales.size > 1) {
+        // Convertir hora_servidor a minutos
+        const convertToMinutes = (timeString: string) => {
+          const [time, modifier] = timeString.split(' ');
+          let [hours, minutes] = time.split(':').map(Number);
+          if (modifier === 'PM' && hours !== 12) {
+            hours += 12;
+          }
+          if (modifier === 'AM' && hours === 12) {
+            hours = 0;
+          }
+          return hours * 60 + minutes;
+        };
           // Comparar la posición 0 con la posición 1 solo si el primer fiscal es "Terminal" y el segundo es "Centro"
           
           for (let i = 0; i < group.length - 1; i++) {
@@ -561,7 +565,7 @@ export default function Index({
 
       });
       return sortedRegistros;
-    };
+    },[]);
 
 
 
