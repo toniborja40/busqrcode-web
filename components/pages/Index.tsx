@@ -15,7 +15,7 @@ import {
   CardHeader,
 } from "@nextui-org/react";
 import classNames from "classnames";
-import { useEffect, useState, useRef, useCallback, useMemo } from "react";
+import { useEffect, useState, useRef } from "react";
 import html2canvas from 'html2canvas';
 import ReactDOMServer from 'react-dom/server';
 import { toast } from "react-toastify";
@@ -121,43 +121,40 @@ export default function Index({
   const [showOrden, setShowOrden] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isAtTop, setIsAtTop] = useState(true);
-
-
+  const [mostrarRetardados, setMostrarRetardados] = useState(true)
   useEffect(() => {
     const handleScroll = () => {
       setIsAtTop(window.scrollY === 0);
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener('scroll', handleScroll);
     return () => {
-      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener('scroll', handleScroll);
     };
   }, []);
 
-  const scrollUp = useCallback(() => {
+
+  const scrollUp = () => {
     window.scrollTo({
       top: 0,
-      behavior: "smooth",
+      behavior: 'smooth'
     });
-  }, []);
-
-  const fetchData = useCallback(async () => {
+  }
+  const fetchData = async () => {
     setLoading(true);
     try {
       const response = await axios.post("/api/timestamps", { fecha: fecha });
       setTimestamps_(response.data);
     } catch (error) {
-      console.log("error", fecha);
+      console.log('error', fecha);
       console.log(error);
     } finally {
       setLoading(false);
     }
-  }, [fecha]);
-
+  };
   useEffect(() => {
     fetchData();
-  }, [fecha, fetchData]);
-
+  }, [fecha]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -459,40 +456,40 @@ export default function Index({
 
 
     // Función para comparar registros
-  const compareTimestamps = useCallback((timestamps: any[]) => {
-    const grouped = timestamps.reduce((acc: any, timestamp: any) => {
-      const key = `${timestamp.unidad}-${timestamp.ruta}`;
-      if (!acc[key]) {
-        acc[key] = [];
-      }
-      acc[key].push(timestamp);
-      return acc;
-    }, {});
+    const compareTimestamps = (timestamps: any[]) => {
+      const grouped = timestamps.reduce((acc: any, timestamp: any) => {
+        const key = `${timestamp.unidad}-${timestamp.ruta}`;
+        if (!acc[key]) {
+          acc[key] = [];
+        }
+        acc[key].push(timestamp);
+        return acc;
+      }, {});
 
-    // Ordenar las claves de los grupos por el número de unidad
-    const sortedKeys = Object.keys(grouped).sort((a, b) => {
-      const unitA = parseInt(a.split('-')[0], 10);
-      const unitB = parseInt(b.split('-')[0], 10);
-      return unitA - unitB;
-    });
+      // Ordenar las claves de los grupos por el número de unidad
+      const sortedKeys = Object.keys(grouped).sort((a, b) => {
+        const unitA = parseInt(a.split('-')[0], 10);
+        const unitB = parseInt(b.split('-')[0], 10);
+        return unitA - unitB;
+      });
+      let sortedRegistros: any[] = []
+      sortedKeys.forEach((key) => {
+        const group = grouped[key];
+        const fiscales = new Set(group.map((timestamp: any) => timestamp.fiscal));
+        if (fiscales.size > 1) {
+          // Convertir hora_servidor a minutos
+          const convertToMinutes = (timeString: string) => {
+            const [time, modifier] = timeString.split(' ');
+            let [hours, minutes] = time.split(':').map(Number);
+            if (modifier === 'PM' && hours !== 12) {
+              hours += 12;
+            }
+            if (modifier === 'AM' && hours === 12) {
+              hours = 0;
+            }
+            return hours * 60 + minutes;
+          };
 
-    let sortedRegistros: any[] = [];
-    sortedKeys.forEach((key) => {
-      const group = grouped[key];
-      const fiscales = new Set(group.map((timestamp: any) => timestamp.fiscal));
-      if (fiscales.size > 1) {
-        // Convertir hora_servidor a minutos
-        const convertToMinutes = (timeString: string) => {
-          const [time, modifier] = timeString.split(' ');
-          let [hours, minutes] = time.split(':').map(Number);
-          if (modifier === 'PM' && hours !== 12) {
-            hours += 12;
-          }
-          if (modifier === 'AM' && hours === 12) {
-            hours = 0;
-          }
-          return hours * 60 + minutes;
-        };
           // Comparar la posición 0 con la posición 1 solo si el primer fiscal es "Terminal" y el segundo es "Centro"
           
           for (let i = 0; i < group.length - 1; i++) {
@@ -516,7 +513,7 @@ export default function Index({
               group[i + 2].delay = diff > 45 ? diff - 45 : 0;
             }
             if (group[i].fiscal == 'Barrancas' && group[i + 1]?.fiscal == 'Panaderia') {
-              const time1 = convertToMinutes(group[i].hora_servidor);
+              const time1 = convertToMinutes(group[i].hora_telefono);
               const time2 = convertToMinutes(group[i + 1].hora_telefono);
               const diff = time2 - time1;
               const isBefore8am = time1 < 8 * 60; // 8am in minutes
@@ -565,16 +562,23 @@ export default function Index({
 
       });
       return sortedRegistros;
-    },[]);
+    };
 
-
+  // Función para filtrar registros retardados
+  const getRegistrosRetardados = (registrosOrdenados: any[]): any[] => {
+    return registrosOrdenados.filter(registro =>
+      registro.group.some((item: any) => item.onTime === false)
+    );
+  };
 
     // Llamar a la función de comparación
     const registrosOrdenados = compareTimestamps(setTimestamps);
     console.log(registrosOrdenados);
+
+  // Filtrar registros retardados
+  const registrosRetardados = getRegistrosRetardados(registrosOrdenados);
+  console.log(registrosRetardados);
     
-    //FALTA OPTIMIZAR <-----------!!!!!!
-    // requerir los datos de registros ordenados e insertarlos en un nuevo contenedor
 
 
     //descargar imagenes
@@ -631,12 +635,6 @@ export default function Index({
         link.download = `${title} ${fecha}.png`;
         link.click();
 
-        // // Crear un nuevo PDF
-        // const pdf = new jsPDF();
-        // pdf.addImage(dataUrl, 'PNG', 10, 10, 180, 160); // Ajusta las dimensiones según sea necesario
-        // pdf.save(`${title} ${new Date().toLocaleDateString()}.pdf`);
-
-
         // Limpiar el contenedor oculto
         if (hiddenContainerRef.current) {
           hiddenContainerRef.current.innerHTML = '';
@@ -645,74 +643,94 @@ export default function Index({
     }
   };
   // recolectar los datos del servidor y hacer de nuevo otro componente en vez de clonar  ----> opción para desarrollar después
+  //  Crear un nuevo PDF
+  const handleDownloadAllRetardados = async () => {
+    if (hiddenContainerRef.current) {
+      // Limpiar el contenedor oculto
+      hiddenContainerRef.current.innerHTML = '';
 
+      // Crear un contenedor para todos los registros retardados
+      const container = document.createElement('div');
+      container.style.position = 'absolute';
+      container.style.top = '0';
+      container.style.left = '0';
+      container.style.width = 'auto';
+      container.style.height = 'auto';
+      container.style.overflow = 'visible';
 
-  // Función para filtrar los grupos que tienen al menos una propiedad onTime igual a false
-   const getLateGroupsRefs = () => {
-    const filteredData = registrosOrdenados.reduce((acc: any[], registro: any) => {
-      const hasLateItem = registro.group.some((item: any) => item.onTime === false);
-      if (hasLateItem) {
-        acc.push(registro.group);
-      }
-      return acc;
-    }, []);
+      // Añadir todos los registros retardados al contenedor
+      registrosRetardados.forEach((registro, index) => {
+        const cardHtml = ReactDOMServer.renderToString(
+          <CustomCard
+            columns1={columns1}
+            titulo={registro.title}
+            group={registro.group}
+            onDownload={() => handleDownloadImage(index, registro.title)}
+          />
+        );
 
-    // Mostrar los datos por consola
-    console.log(filteredData);
+        const cardClone = document.createElement('div');
+        cardClone.innerHTML = cardHtml;
+        container.appendChild(cardClone);
+      });
 
-    return filteredData;
+      // Añadir el contenedor al contenedor oculto
+      hiddenContainerRef.current.appendChild(container);
+
+      // Usar requestAnimationFrame para mejorar el rendimiento
+      requestAnimationFrame(async () => {
+        const canvas = await html2canvas(container, { useCORS: true });
+        const imgData = canvas.toDataURL('image/png');
+
+        // Crear un nuevo PDF
+        const pdf = new jsPDF();
+        const imgProps = pdf.getImageProperties(imgData);
+        const pdfWidth = pdf.internal.pageSize.getWidth() - 20;
+        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        let yOffset = 20;
+
+        pdf.text(`Registros Retardados de ${fecha}`, 10, 10);
+        yOffset += 10; // Añadir margen de separación
+
+          // ------>!!!!!!! falta por arreglar la parte de arriba de la primera imagen
+        if (pdfHeight < pageHeight - yOffset) {
+          pdf.addImage(imgData, 'PNG', 10, yOffset, pdfWidth, pdfHeight);
+        } else {
+          let remainingHeight = pdfHeight;
+          let position = yOffset;
+
+          while (remainingHeight > 0) {
+            if (position + pdfHeight <= pageHeight) {
+              pdf.addImage(imgData, 'PNG', 10, position, pdfWidth, pdfHeight);
+              remainingHeight = 0;
+            } else {
+              const canvasHeight = (pageHeight - position) * (imgProps.width / pdfWidth);
+              const canvasSlice = document.createElement('canvas');
+              canvasSlice.width = imgProps.width;
+              canvasSlice.height = canvasHeight;
+              const ctx = canvasSlice.getContext('2d');
+              if (ctx) {
+                ctx.drawImage(canvas, 0, position * (imgProps.width / pdfWidth), imgProps.width, canvasHeight, 0, 0, imgProps.width, canvasHeight);
+              }
+              const imgSlice = canvasSlice.toDataURL('image/png');
+              pdf.addImage(imgSlice, 'PNG', 10, position, pdfWidth, pageHeight - position);
+              remainingHeight -= pageHeight - position;
+              position = 0;
+              pdf.addPage();
+            }
+          }
+        }
+
+        pdf.save(`Registros Retardados de ${fecha}.pdf`);
+
+        // Limpiar el contenedor oculto
+        if (hiddenContainerRef.current) {
+          hiddenContainerRef.current.innerHTML = '';
+        }
+      });
+    }
   };
-
-  // // Función para generar el PDF
-  // const generatePDF = async () => {
-  //   const filteredData = getLateGroupsRefs();
-  //   const pdf = new jsPDF();
-  //   let yOffset = 10;
-
-  //   for (const { title, group } of filteredData) {
-  //     // Crear un clon de la estructura de la tabla sin los datos
-  //     const tableClone = document.createElement('div');
-  //     tableClone.innerHTML = `
-  //       <table>
-  //         <thead>
-  //           <tr>
-  //             ${columns1.map(column => `<th>${column.label}</th>`).join('')}
-  //           </tr>
-  //         </thead>
-  //         <tbody>
-  //           ${group.map((item: { [x: string]: any; }) => `
-  //             <tr>
-  //               ${columns1.map(column => `<td>${item[column.key]}</td>`).join('')}
-  //             </tr>
-  //           `).join('')}
-  //         </tbody>
-  //       </table>
-  //     `;
-
-  //     // Añadir el clon al contenedor oculto
-  //     if (hiddenContainerRef.current) {
-  //       hiddenContainerRef.current.appendChild(tableClone);
-  //     }
-
-  //     // Usar html2canvas para capturar la imagen del clon
-  //     const canvas = await html2canvas(tableClone, { useCORS: true });
-  //     const imgData = canvas.toDataURL('image/png');
-  //     pdf.addImage(imgData, 'PNG', 10, yOffset, 180, 60);
-  //     yOffset += 72; // Separación de 12 píxeles entre cada registro
-
-  //     // Limpiar el contenedor oculto
-  //     if (hiddenContainerRef.current) {
-  //       hiddenContainerRef.current.innerHTML = '';
-  //     }
-
-  //     // Añadir título
-  //     pdf.text(`Unidad ${title}`, 10, yOffset - 62);
-  //   }
-
-  //   // Guardar el PDF con el nombre de la fecha de hoy + 'buses retardados'
-  //   pdf.save(`${new Date().toLocaleDateString()} buses retardados.pdf`);
-  // };
-
 
 
   useEffect(() => {
@@ -854,6 +872,8 @@ export default function Index({
                 <Button onClick={() => setShowOrden(!showOrden)} className="bg-sky-600 font-bold">
                   {showOrden ? "Ocultar Registros Ordenados" : "Mostrar Registros Ordenados"}
                 </Button>
+                {showOrden ? <Button onClick={() => setMostrarRetardados(!mostrarRetardados)} className="bg-sky-600 font-bold"> {mostrarRetardados ? "Todos los Registros" : "Solo Retardados"}</Button> : ''}
+                {showOrden && mostrarRetardados ? <Button onClick={handleDownloadAllRetardados} className = "bg-sky-600 font-bold">Imprimir PDF</Button> : ''}
                 {/* <Button onClick={generatePDF} className="bg-sky-600 font-bold">
                  Imprimir Retardados
                 </Button> */}
@@ -864,8 +884,8 @@ export default function Index({
      </section>
      {showOrden && <section className='flex flex-col items-center justify-center gap-4'>
         <h1 className="text-xl font-bold mt-4">Registros ordenados</h1>
-        <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4 ">
-          {registrosOrdenados && registrosOrdenados.map((registro: any, index: number) => (
+        <div className={`p-5 grid grid-cols-1 ${mostrarRetardados ? 'sm:grid-cols-1' : 'sm:grid-cols-2'} gap-4 `}>
+          {mostrarRetardados ? registrosRetardados && registrosRetardados.map((registro: any, index: number) => (
             <Card className='relative' key={registro.title} ref={el => { cardRefs.current[index] = el; }}>
                   <CardHeader>
               <Button
@@ -903,6 +923,44 @@ export default function Index({
                     </Table>
                   </CardBody>
                 </Card>
+          )) : registrosOrdenados && registrosOrdenados.map((registro: any, index: number) => (
+            <Card className='relative' key={registro.title} ref={el => { cardRefs.current[index] = el; }}>
+              <CardHeader>
+                <Button
+                  onClick={() => handleDownloadImage(index, registro.title)}
+                  className="absolute top-2 right-2 bg-blue-500 text-white p-1 rounded"
+                >
+                  Descargar
+                </Button>
+                <h1 className="font-bold text-lg">{registro.title}</h1>
+              </CardHeader>
+              <Divider />
+              <CardBody className='h-72'>
+                <Table aria-label={`Tabla de ${registro.title}`}>
+                  <TableHeader columns={columns1} aria-label="Tabla">
+                    {(column) => (
+                      <TableColumn key={column.key}>{column.label}</TableColumn>
+                    )}
+                  </TableHeader>
+                  <TableBody items={registro.group} aria-label="Tabla" >
+                    {(item) => (
+                      <TableRow key={(item as any).key} className={classNames('rounded', {
+                        "bg-red-700": (item as any).onTime === false,
+                      })}
+                        aria-label="Tabla">
+                        {(columnKey) => (
+                          <TableCell>
+                            {/* <Link href={`/registros/${item.key}`}> */}
+                            {getKeyValue(item, columnKey)}
+                            {/* </Link> */}
+                          </TableCell>
+                        )}
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </CardBody>
+            </Card>
           ))}
         </div>
       </section>}
