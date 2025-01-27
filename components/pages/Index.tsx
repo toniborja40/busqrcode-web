@@ -592,20 +592,20 @@ export default function Index({
     if (ref && hiddenContainerRef.current) {
       // Limpiar el contenedor oculto
       hiddenContainerRef.current.innerHTML = '';
-      if (index >= 0 && index < registrosOrdenados.length) {
-        setSelectedRegistro(registrosOrdenados[index]);
+      if (index >= 0 && index < registrosRetardados.length) {
+        setSelectedRegistro(registrosRetardados[index]);
       }
       // Extraer los datos de la tabla
       const tableData = ref.outerHTML || '';
-      console.log(registrosOrdenados[index])
+      console.log(registrosRetardados[index])
       // Crear un nuevo componente que contenga los datos
 
       const cardHtml = ReactDOMServer.renderToString(
         <CustomCard
           columns1={columns1}
-          titulo={registrosOrdenados[index].title}
-          group={registrosOrdenados[index].group}
-          onDownload={() => handleDownloadImage(index, registrosOrdenados[index].title)}
+          titulo={registrosRetardados[index].title}
+          group={registrosRetardados[index].group}
+          onDownload={() => handleDownloadImage(index, registrosRetardados[index].title)}
         />
       );
 
@@ -926,12 +926,12 @@ export default function Index({
           )) : registrosOrdenados && registrosOrdenados.map((registro: any, index: number) => (
             <Card className='relative' key={registro.title} ref={el => { cardRefs.current[index] = el; }}>
               <CardHeader>
-                <Button
+               {mostrarRetardados && <Button
                   onClick={() => handleDownloadImage(index, registro.title)}
                   className="absolute top-2 right-2 bg-blue-500 text-white p-1 rounded"
                 >
                   Descargar
-                </Button>
+                </Button>}
                 <h1 className="font-bold text-lg">{registro.title}</h1>
               </CardHeader>
               <Divider />
