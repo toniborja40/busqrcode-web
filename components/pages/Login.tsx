@@ -1,5 +1,5 @@
 'use client'
-import { Button, Card, CardBody, CardHeader, Divider, Input } from "@nextui-org/react";
+import { Button, Card, CardBody, CardHeader, Divider, Input } from "@heroui/react";
 import EyeSlashFilledIcon from "./EyeSlasFilledIcon";
 import EyeFilledIcon from "./EyeFilledIcon";
 import { useState } from "react";

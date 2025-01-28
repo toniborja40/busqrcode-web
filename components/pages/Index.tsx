@@ -13,7 +13,7 @@ import {
   Button,
   Divider,
   CardHeader,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import classNames from "classnames";
 import { useEffect, useState, useRef } from "react";
 import html2canvas from 'html2canvas';
@@ -831,10 +831,10 @@ export default function Index({
                 </select>
               </div>
               <div className='flex flex-col sm:flex-row sm:justify-end sm:items-end justify-center items-center gap-4'>
-                <Button onClick={resetFilter} className="bg-sky-600 font-bold">
+                <Button onPress={resetFilter} className="bg-sky-600 font-bold">
                   Reset
                 </Button>
-                <Button onClick={() => setShowRows(!showRows)} className="bg-sky-600 font-bold">
+                <Button onPress={() => setShowRows(!showRows)} className="bg-sky-600 font-bold">
                   {showRows ? "Ocultar Lista" : "Mostrar Lista"}
                 </Button>
 
@@ -842,18 +842,18 @@ export default function Index({
                   <>
                   {loading ? <Button className="bg-sky-600 font-bold cursor-default">
                     Cargando...
-                    </Button> : <Button onClick={fetchData} className="bg-sky-600 font-bold">
+                    </Button> : <Button onPress={fetchData} className="bg-sky-600 font-bold">
                   Refrescar registros
                 </Button>}
                 </>
                 ):''}
 
-                <Button onClick={() => setShowOrden(!showOrden)} className="bg-sky-600 font-bold">
+                <Button onPress={() => setShowOrden(!showOrden)} className="bg-sky-600 font-bold">
                   {showOrden ? "Ocultar Registros Ordenados" : "Mostrar Registros Ordenados"}
                 </Button>
-                {showOrden ? <Button onClick={() => setMostrarRetardados(!mostrarRetardados)} className="bg-sky-600 font-bold"> {mostrarRetardados ? "Todos los Registros" : "Solo Retardados"}</Button> : ''}
-                {showOrden && mostrarRetardados ? <Button onClick={handleDownloadAllRetardados} className = "bg-sky-600 font-bold">Imprimir PDF</Button> : ''}
-                {/* <Button onClick={generatePDF} className="bg-sky-600 font-bold">
+                {showOrden ? <Button onPress={() => setMostrarRetardados(!mostrarRetardados)} className="bg-sky-600 font-bold"> {mostrarRetardados ? "Todos los Registros" : "Solo Retardados"}</Button> : ''}
+                {showOrden && mostrarRetardados ? <Button onPress={handleDownloadAllRetardados} className = "bg-sky-600 font-bold">Imprimir PDF</Button> : ''}
+                {/* <Button onPress={generatePDF} className="bg-sky-600 font-bold">
                  Imprimir Retardados
                 </Button> */}
               </div>
@@ -868,7 +868,7 @@ export default function Index({
             <Card className='relative' key={registro.title} ref={el => { cardRefs.current[index] = el; }}>
                   <CardHeader>
               <Button
-                onClick={() => handleDownloadImage(index, registro.title)}
+                onPress={() => handleDownloadImage(index, registro.title)}
                 className="absolute top-2 right-2 bg-blue-500 text-white p-1 rounded"
               >
                 Descargar
@@ -906,7 +906,7 @@ export default function Index({
             <Card className='relative' key={registro.title} ref={el => { cardRefs.current[index] = el; }}>
               <CardHeader>
                {mostrarRetardados && <Button
-                  onClick={() => handleDownloadImage(index, registro.title)}
+                  onPress={() => handleDownloadImage(index, registro.title)}
                   className="absolute top-2 right-2 bg-blue-500 text-white p-1 rounded"
                 >
                   Descargar
@@ -1004,14 +1004,14 @@ export default function Index({
           <>
           {loading ? <Button className="bg-red-600 font-bold p-4 rounded-full shadow-lg cursor-default">
             Cargando...
-            </Button> :  <Button onClick={fetchData} className="bg-red-600 font-bold p-4 rounded-full shadow-lg">
+            </Button> :  <Button onPress={fetchData} className="bg-red-600 font-bold p-4 rounded-full shadow-lg">
        Refrescar registros
         </Button>
         }
           </>
             )
         : ''}
-          <Button onClick={scrollUp} className="bg-sky-600 font-bold p-4 rounded-full shadow-lg m-4">
+          <Button onPress={scrollUp} className="bg-sky-600 font-bold p-4 rounded-full shadow-lg m-4">
             Subir
             <ScrollUpIcon />
           </Button>

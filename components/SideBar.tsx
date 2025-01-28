@@ -1,5 +1,5 @@
 "use client";
-import { ScrollShadow } from "@nextui-org/react";
+import { ScrollShadow } from "@heroui/react";
 interface SideBarProps {
   children?: any;
 }

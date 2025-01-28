@@ -1,5 +1,5 @@
 'use client'
-import { Card, CardHeader, CardBody, CardFooter, Divider, Link, Image, Button, Input, Textarea, Switch } from "@nextui-org/react";
+import { Card, CardHeader, CardBody, CardFooter, Divider, Link, Image, Button, Input, Textarea, Switch } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { toast } from 'react-toastify'
 import axios from 'axios'

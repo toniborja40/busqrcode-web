@@ -1,5 +1,5 @@
 'use client'
-import { Input, Divider, Button, Textarea, TimeInput, Checkbox, Card, CardBody, Switch } from "@nextui-org/react";
+import { Input, Divider, Button, Textarea, TimeInput, Checkbox, Card, CardBody, Switch } from "@heroui/react";
 import { Time } from "@internationalized/date";
 import { toast } from "react-toastify";
 import { useState, useEffect } from "react";

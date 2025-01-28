@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Card, CardBody, CardHeader, Divider, Link } from "@nextui-org/react";
+import { Button, Card, CardBody, CardHeader, Divider, Link } from "@heroui/react";
 
 interface HorariosProps {
   horarios?: any;

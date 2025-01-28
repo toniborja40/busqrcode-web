@@ -18,7 +18,7 @@ import {
   TableCell,
   getKeyValue,
   Link,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { Time } from "@internationalized/date";
 import { toast } from "react-toastify";
 import { useState, useEffect } from "react";

@@ -1,7 +1,7 @@
 "use client";
 import {
     Card, CardHeader, CardBody, CardFooter, Divider, Image, Button, Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, RadioGroup, Radio, getKeyValue,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import axios from "axios";
