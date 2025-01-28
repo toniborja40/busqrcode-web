@@ -679,49 +679,28 @@ export default function Index({
 
       // Usar requestAnimationFrame para mejorar el rendimiento
       requestAnimationFrame(async () => {
-        const canvas = await html2canvas(container, { useCORS: true });
-        const imgData = canvas.toDataURL('image/png');
-
-        // Crear un nuevo PDF
         const pdf = new jsPDF();
-        const imgProps = pdf.getImageProperties(imgData);
-        const pdfWidth = pdf.internal.pageSize.getWidth() - 20;
-        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
         const pageHeight = pdf.internal.pageSize.getHeight();
-        let yOffset = 20;
+        const pdfWidth = pdf.internal.pageSize.getWidth() - 20;
+        let yOffset = 14;
 
         pdf.text(`Registros Retardados de ${fecha}`, 10, 10);
-        yOffset += 10; // Añadir margen de separación
 
-          // ------>!!!!!!! falta por arreglar la parte de arriba de la primera imagen
-        if (pdfHeight < pageHeight - yOffset) {
-          pdf.addImage(imgData, 'PNG', 10, yOffset, pdfWidth, pdfHeight);
-        } else {
-          let remainingHeight = pdfHeight;
-          let position = yOffset;
+        for (let i = 0; i < container.children.length; i++) {
+          const cardClone = container.children[i] as HTMLElement;
+          const canvas = await html2canvas(cardClone, { useCORS: true });
+          const imgData = canvas.toDataURL('image/png');
+          const imgProps = pdf.getImageProperties(imgData);
+          const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
-          while (remainingHeight > 0) {
-            if (position + pdfHeight <= pageHeight) {
-              pdf.addImage(imgData, 'PNG', 10, position, pdfWidth, pdfHeight);
-              remainingHeight = 0;
-            } else {
-              const canvasHeight = (pageHeight - position) * (imgProps.width / pdfWidth);
-              const canvasSlice = document.createElement('canvas');
-              canvasSlice.width = imgProps.width;
-              canvasSlice.height = canvasHeight;
-              const ctx = canvasSlice.getContext('2d');
-              if (ctx) {
-                ctx.drawImage(canvas, 0, position * (imgProps.width / pdfWidth), imgProps.width, canvasHeight, 0, 0, imgProps.width, canvasHeight);
-              }
-              const imgSlice = canvasSlice.toDataURL('image/png');
-              pdf.addImage(imgSlice, 'PNG', 10, position, pdfWidth, pageHeight - position);
-              remainingHeight -= pageHeight - position;
-              position = 0;
-              pdf.addPage();
-            }
+          if (yOffset + pdfHeight > pageHeight) {
+            pdf.addPage();
+            yOffset = 10; // Reiniciar el offset en la nueva página
           }
-        }
 
+          pdf.addImage(imgData, 'PNG', 10, yOffset, pdfWidth, pdfHeight);
+          yOffset += pdfHeight + 10; // Añadir margen entre imágenes
+        }
         pdf.save(`Registros Retardados de ${fecha}.pdf`);
 
         // Limpiar el contenedor oculto
