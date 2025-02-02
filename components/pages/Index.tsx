@@ -536,19 +536,19 @@ export default function Index({
               const time1 = convertToMinutes(group[i].hora_servidor);
               const time2 = convertToMinutes(group[i + 2].hora_telefono);
               const diff = time2 - time1;
-              group[i + 2].onTime = diff <= 45;
-              group[i + 2].onTimeText = diff <= 45 ? "A tiempo" : "Retardado";
+              group[i + 2].onTime = diff <= 47;
+              group[i + 2].onTimeText = diff <= 47 ? "A tiempo" : "Retardado";
               group[i + 2].diff = diff;
-              group[i + 2].delay = diff > 45 ? diff - 45 : 0;
+              group[i + 2].delay = diff > 47 ? diff - 47 : 0;
             }
             if (group[i].fiscal == "Terminal" && group[i + 1]?.fiscal == "Panaderia") {
               const time1 = convertToMinutes(group[i].hora_servidor);
               const time2 = convertToMinutes(group[i + 1].hora_telefono);
               const diff = time2 - time1;
-              group[i + 1].onTime = diff <= 45;
-              group[i + 1].onTimeText = diff <= 45 ? "A tiempo" : "Retardado";
+              group[i + 1].onTime = diff <= 47;
+              group[i + 1].onTimeText = diff <= 47 ? "A tiempo" : "Retardado";
               group[i + 1].diff = diff;
-              group[i + 1].delay = diff > 45 ? diff - 45 : 0;
+              group[i + 1].delay = diff > 47 ? diff - 47 : 0;
             }
           }
 
