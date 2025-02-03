@@ -25,7 +25,7 @@ export async function POST(request: any) {
       });
 
            return NextResponse.json(
-             { registros },
+             registros ,
              { status: 200 }
            );
     } catch (error) {
