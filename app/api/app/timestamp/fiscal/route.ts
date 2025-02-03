@@ -25,7 +25,7 @@ export async function POST(request: any) {
       });
 
            return NextResponse.json(
-             { numero_fiscal, id_fiscal, registros },
+             { registros },
              { status: 200 }
            );
     } catch (error) {
