@@ -629,10 +629,10 @@ export default function Index({
       // Usar requestAnimationFrame para mejorar el rendimiento
       requestAnimationFrame(async () => {
         const canvas = await html2canvas(cardClone, { useCORS: true });
-        const dataUrl = canvas.toDataURL('image/png');
+        const dataUrl = canvas.toDataURL('image/jpeg', 1);
         const link = document.createElement('a');
         link.href = dataUrl;
-        link.download = `${title} ${fecha}.png`;
+        link.download = `${title} ${fecha}.jpeg`;
         link.click();
 
         // Limpiar el contenedor oculto
@@ -689,8 +689,9 @@ export default function Index({
         for (let i = 0; i < container.children.length; i++) {
           const cardClone = container.children[i] as HTMLElement;
           const canvas = await html2canvas(cardClone, { useCORS: true });
-          const imgData = canvas.toDataURL('image/png');
+          const imgData = canvas.toDataURL('image/jpeg');
           const imgProps = pdf.getImageProperties(imgData);
+          const pdfWidth = pdf.internal.pageSize.getWidth() - 20;
           const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
           if (yOffset + pdfHeight > pageHeight) {
@@ -698,8 +699,8 @@ export default function Index({
             yOffset = 10; // Reiniciar el offset en la nueva página
           }
 
-          pdf.addImage(imgData, 'PNG', 10, yOffset, pdfWidth, pdfHeight);
-          yOffset += pdfHeight + 10; // Añadir margen entre imágenes
+          pdf.addImage(imgData, 'JPEG', 10, yOffset, pdfWidth, pdfHeight);
+          yOffset += pdfHeight; // Añadir margen entre imágenes
         }
         pdf.save(`Registros Retardados de ${fecha}.pdf`);
 
