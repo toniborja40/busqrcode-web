@@ -26,10 +26,6 @@ export default function Navbar_header(verification: any) {
   return (
     <Navbar onMenuOpenChange={setIsMenuOpen} className=" grid grid-cols-2 bg-blue-950 w-full">
       <NavbarContent>
-        <NavbarMenuToggle
-          aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-          className="sm:hidden"
-        />
         <NavbarBrand>
           
           <Link href="/" className="font-bold text-white">BusQRCode</Link>
