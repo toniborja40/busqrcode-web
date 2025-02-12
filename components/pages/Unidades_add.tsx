@@ -46,9 +46,9 @@ export default function Unidades_add({  unidades }: UnidadesProps) {
 
     return(
         <>
-            <div className="mb-10 rounded-sm border border-stroke dark:bg-slate-800 bg-slate-200 shadow-default dark:border-strokedark dark:bg-boxdark">
+            <div className=" rounded-sm border border-stroke dark:bg-slate-800 bg-slate-200 shadow-default dark:border-strokedark dark:bg-boxdark p-8">
                 <div className="flex justify-center items-center ">
-                    <Card className="my-5 lg:w-1/2">
+                    <Card className="mb-5">
                         <CardBody className="m-2">
                         <div className="m-5 ">
                             <h1 className="text-xl font-bold">Agregar Unidad</h1>
