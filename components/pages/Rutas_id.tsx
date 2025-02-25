@@ -153,8 +153,8 @@ export default function Rutas_id({ ruta, params, fiscales}: Plantillas_Pizarras_
     return (
         <>
             <div className="mb-10 rounded-sm border border-stroke dark:bg-slate-800 bg-slate-200 shadow-default dark:border-strokedark dark:bg-boxdark">
-                <div className="flex flex-col justify-center items-center ">
-                    <Card className="my-5 lg:w-1/2">
+                <div className="flex flex-col justify-center items-center p-8">
+                    <Card className="mb-5 ">
                         <CardBody className="m-2">
                             <div className="m-5 ">
                                 <h1 className="text-xl font-bold">Editar ruta</h1>
