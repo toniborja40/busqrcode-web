@@ -449,12 +449,7 @@ export default function Index({
     // setUnidadesOrdenadas(unidadesordenadas);
 
 
-
-sadafsdhrt
-
-
-
-
+    //xd
     // Función para comparar registros
     const compareTimestamps = (timestamps: any[]) => {
       const grouped = timestamps.reduce((acc: any, timestamp: any) => {
